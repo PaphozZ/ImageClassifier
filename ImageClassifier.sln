@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37027.9 d17.14
+VisualStudioVersion = 17.14.37027.9
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageClassifier", "ImageClassifier.csproj", "{F2C5D37C-915F-40E6-8BCE-13CF5E19CB7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageClassifier", "ImageClassifier\ImageClassifier.csproj", "{F2C5D37C-915F-40E6-8BCE-13CF5E19CB7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageClassifier.ViewModel", "ImageClassifier.ViewModel\ImageClassifier.ViewModel.csproj", "{A87B9313-709F-4462-AD81-A73C6EE89FDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageClassifier.Core", "ImageClassifier.Core\ImageClassifier.Core.csproj", "{8A4E3AD1-65A7-4A13-9C20-03F203720613}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{F2C5D37C-915F-40E6-8BCE-13CF5E19CB7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2C5D37C-915F-40E6-8BCE-13CF5E19CB7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2C5D37C-915F-40E6-8BCE-13CF5E19CB7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A87B9313-709F-4462-AD81-A73C6EE89FDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A87B9313-709F-4462-AD81-A73C6EE89FDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A87B9313-709F-4462-AD81-A73C6EE89FDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A87B9313-709F-4462-AD81-A73C6EE89FDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A4E3AD1-65A7-4A13-9C20-03F203720613}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A4E3AD1-65A7-4A13-9C20-03F203720613}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A4E3AD1-65A7-4A13-9C20-03F203720613}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A4E3AD1-65A7-4A13-9C20-03F203720613}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
