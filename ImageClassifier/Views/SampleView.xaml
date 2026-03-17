@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:ImageClassifier.ViewModel.ViewModels;assembly=ImageClassifier.ViewModel"
-             x:Class="ImageClassifier.MainPage"
-             x:DataType="vm:MainViewModel">
+             x:Class="ImageClassifier.Views.SampleView"
+             x:DataType="vm:SampleViewModel">
 
     <ScrollView>
         <VerticalStackLayout
@@ -35,4 +35,4 @@
         </VerticalStackLayout>
     </ScrollView>
 
-</ContentPage>
+</ContentView>

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ImageClassifier.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace ImageClassifier
 {

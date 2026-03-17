@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ImageClassifier.ViewModel.ViewModels;assembly=ImageClassifier.ViewModel"
+             x:Class="ImageClassifier.Pages.MainPage"
+             xmlns:v="clr-namespace:ImageClassifier.Views"
+             xmlns:s="clr-namespace:ImageClassifier.Selectors"
+             xmlns:c="clr-namespace:ImageClassifier.Converters"
+             x:DataType="vm:MainViewModel">
+
+    <ContentPage.Resources>
+        <c:SingleObjectToArrayConverter x:Key="SingleObjectToArrayConverter"/>
+        
+        <DataTemplate x:Key="sampleTemplate">
+            <v:SampleView/>
+        </DataTemplate>
+
+        <s:ViewTemplateSelector x:Key="viewSelector"
+            SampleViewTemplate="{StaticResource sampleTemplate}"/>
+    </ContentPage.Resources>
+
+    <Grid BindableLayout.ItemsSource="{Binding CurrentView, Converter={StaticResource SingleObjectToArrayConverter}}"
+          BindableLayout.ItemTemplateSelector="{StaticResource viewSelector}" />
+
+</ContentPage>
