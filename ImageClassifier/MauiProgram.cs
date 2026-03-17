@@ -13,7 +13,8 @@ namespace ImageClassifier
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+                })
+                .Services.AddViewModels();
 
 #if DEBUG
     		builder.Logging.AddDebug();

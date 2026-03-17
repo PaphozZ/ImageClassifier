@@ -1,32 +1,17 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace ImageClassifier.ViewModel.ViewModels
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public partial class MainViewModel : ObservableObject
     {
         int _count = 0;
-        public ICommand OnCounterClickedCommand { get; }
 
+        [ObservableProperty]
         private string _buttonText = "Click me";
 
-        public MainViewModel()
-        {
-            OnCounterClickedCommand = new Command(OnCounterClicked);
-        }
-
-        public string ButtonText
-        {  
-            get => _buttonText;
-            set 
-            {
-                _buttonText = value;
-                OnPropertyChanged(nameof(ButtonText));
-            }
-        }
-
-        public void OnCounterClicked()
+        [RelayCommand]
+        private void CounterClicked()
         {
             _count++;
 
@@ -34,12 +19,6 @@ namespace ImageClassifier.ViewModel.ViewModels
                 ButtonText = $"Clicked {_count} time";
             else
                 ButtonText = $"Clicked {_count} times";
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
