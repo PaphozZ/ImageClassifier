@@ -7,7 +7,7 @@ namespace ImageClassifier.ViewModel.ViewModels
         [ObservableProperty]
         private object _currentView;
 
-        public MainViewModel(SampleViewModel viewModel)
+        public MainViewModel(PreviewViewModel viewModel)
         {
             CurrentView = viewModel;
         }

@@ -8,6 +8,7 @@ namespace ImageClassifier.Extensions
         {
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<SampleViewModel>();
+            services.AddSingleton<PreviewViewModel>();
             return services;
         }
     }

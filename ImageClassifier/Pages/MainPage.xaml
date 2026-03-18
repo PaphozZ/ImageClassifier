@@ -15,8 +15,13 @@
             <v:SampleView/>
         </DataTemplate>
 
+        <DataTemplate x:Key="previewTemplate">
+            <v:PreviewView />
+        </DataTemplate>
+
         <s:ViewTemplateSelector x:Key="viewSelector"
-            SampleViewTemplate="{StaticResource sampleTemplate}"/>
+            SampleViewTemplate="{StaticResource sampleTemplate}"
+            PreviewViewTemplate="{StaticResource previewTemplate}"/>
     </ContentPage.Resources>
 
     <Grid BindableLayout.ItemsSource="{Binding CurrentView, Converter={StaticResource SingleObjectToArrayConverter}}"
