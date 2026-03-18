@@ -1,5 +1,8 @@
-﻿using ImageClassifier.Extensions;
+﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Storage;
+using ImageClassifier.Extensions;
 using Microsoft.Extensions.Logging;
+using ImageClassifier.Infrastructure;
 
 namespace ImageClassifier
 {
@@ -10,12 +13,15 @@ namespace ImageClassifier
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 })
-                .Services.AddViewModels();
+                .Services
+                    .AddViewModels()
+                    .AddSingleton<IFolderPicker, DeferredFolderPicker>();
 
 #if DEBUG
     		builder.Logging.AddDebug();

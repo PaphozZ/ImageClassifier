@@ -7,35 +7,88 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0">
             <Image Source="{Binding SelectedImage}" />
         </Grid>
+
         <Grid Grid.Column="1"
               x:Name="SidePanel"
               BackgroundColor="LightGray">
-            <StackLayout Padding="20"
-                         Spacing="50">
+
+            <Grid Padding="20"
+                  RowSpacing="50"
+                  RowDefinitions="Auto, Auto, Auto, *">
+
                 <Label Text="Меню"
-                       FontSize="18" />
-                <Grid RowSpacing="5">
-                    <Button Text="Загрузить файл"
-                            Command="{Binding PickImageCommand}" />
-                </Grid>
-                <StackLayout Spacing="5">
+                       FontSize="18"
+                       Grid.Row="0" />
+
+                <Button Grid.Row="1"
+                        Text="Загрузить файл"
+                        Command="{Binding PickImageCommand}" />
+
+                <StackLayout Grid.Row="2"
+                             Spacing="5">
+
                     <Grid ColumnDefinitions="*,50"
                           ColumnSpacing="5">
+
                         <Entry Grid.Column="0"
                                x:Name="iEntry"
                                Text="" />
                         <Button Grid.Column="1"
                                 Text="…" />
                     </Grid>
-                    <Button Text="Загрузить папку" />
+
+                    <Button Text="Загрузить папку"
+                            Command="{Binding PickFolderCommand}" />
                 </StackLayout>
-            </StackLayout>
+
+                <CollectionView Grid.Row="3"
+                                ItemsSource="{Binding LoadedFiles}"
+                                Margin="10"
+                                VerticalScrollBarVisibility="Always"
+                                Background="White">
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ImageItemViewModel">
+
+                            <Grid Padding="10"
+                                  ColumnDefinitions="80, *"
+                                  RowDefinitions="Auto, Auto">
+
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PreviewViewModel}}, Path=SelectFileCommand, x:DataType=vm:PreviewViewModel}"
+                                                          CommandParameter="{Binding .}" />
+                                </Grid.GestureRecognizers>
+                                
+                                <Image Grid.RowSpan="2"
+                                       Source="{Binding FilePreview}"
+                                       Aspect="AspectFill"
+                                       HeightRequest="70"
+                                       WidthRequest="70"
+                                       Margin="0,0,10,0" />
+
+                                <Label Grid.Column="1"
+                                       Grid.Row="0"
+                                       Text="{Binding FileName}"
+                                       FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation" />
+
+                                <Label Grid.Column="1"
+                                       Grid.Row="1"
+                                       Text="{Binding FilePath}"
+                                       FontSize="Micro"
+                                       TextColor="Gray"
+                                       LineBreakMode="TailTruncation" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
         </Grid>
     </Grid>
 </ContentView>
