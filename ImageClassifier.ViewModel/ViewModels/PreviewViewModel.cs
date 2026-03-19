@@ -30,34 +30,29 @@ public partial class PreviewViewModel : ObservableObject
         _dialogService = dialogService;
         _mediaPickerService = mediaPickerService;
 
-        Task.Run(async () => await FileCollection.LoadSavedFilesAsync())
-            .ContinueWith(task => 
+        Task.Run(() => FileCollection.LoadSavedFilesAsync())
+            .ContinueWith(task =>
             {
-                LoadSavedFilesAsync()
+                LoadImagesAsync()
                     .FireAndForget(ex => Debug.WriteLine($"Ошибка загрузки: {ex}"));
             });
     }
 
-    private async Task LoadSavedFilesAsync()
+    private async Task LoadImagesAsync()
     {
         foreach (var item in FileCollection.Files)
         {
-            await LoadImageAsync(item);
-        }
-    }
-
-    private async Task LoadImageAsync(ImageItemViewModel item)
-    {
-        var FileFullName = (!string.IsNullOrEmpty(item.FileName) && !string.IsNullOrEmpty(item.FilePath))
+            var FileFullName = (!string.IsNullOrEmpty(item.FileName) && !string.IsNullOrEmpty(item.FilePath))
             ? Path.Combine(item.FilePath, item.FileName) : null;
 
-        if (FileFullName != null)
-        {
-            var imageSource = ImageSource.FromFile(FileFullName);
-            await MainThread.InvokeOnMainThreadAsync(() =>
+            if (FileFullName != null)
             {
-                item.FilePreview = imageSource;
-            });
+                var imageSource = ImageSource.FromFile(FileFullName);
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    item.FilePreview = imageSource;
+                });
+            }
         }
     }
 
