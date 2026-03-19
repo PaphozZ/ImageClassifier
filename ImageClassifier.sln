@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageClassifier.ViewModel",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageClassifier.Core", "ImageClassifier.Core\ImageClassifier.Core.csproj", "{8A4E3AD1-65A7-4A13-9C20-03F203720613}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageClassifier.Infrastructure", "ImageClassifier.Infrastructure\ImageClassifier.Infrastructure.csproj", "{50E9DFDD-D50A-23B2-3106-4F822B142302}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{8A4E3AD1-65A7-4A13-9C20-03F203720613}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A4E3AD1-65A7-4A13-9C20-03F203720613}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A4E3AD1-65A7-4A13-9C20-03F203720613}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50E9DFDD-D50A-23B2-3106-4F822B142302}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50E9DFDD-D50A-23B2-3106-4F822B142302}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50E9DFDD-D50A-23B2-3106-4F822B142302}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50E9DFDD-D50A-23B2-3106-4F822B142302}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -73,6 +73,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\ImageClassifier.Infrastructure\ImageClassifier.Infrastructure.csproj" />
 	  <ProjectReference Include="..\ImageClassifier.ViewModel\ImageClassifier.ViewModel.csproj" />
 	</ItemGroup>
 

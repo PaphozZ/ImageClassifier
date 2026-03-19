@@ -1,8 +1,12 @@
 ﻿using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ImageClassifier.Core.Interfaces;
+using ImageClassifier.ViewModel.Extensions;
 using System.Collections.ObjectModel;
 using System.Runtime.Versioning;
+using System.Diagnostics;
+using ImageClassifier.Core.Models;
 
 namespace ImageClassifier.ViewModel.ViewModels
 {
@@ -15,6 +19,7 @@ namespace ImageClassifier.ViewModel.ViewModels
         private ObservableCollection<ImageItemViewModel> _loadedFiles = new();
 
         private readonly IFolderPicker _folderPicker;
+        private readonly IFileStorageService _storageService;
 
         [ObservableProperty]
         private string? _currentFolderPath;
@@ -22,9 +27,41 @@ namespace ImageClassifier.ViewModel.ViewModels
         [ObservableProperty]
         private bool _isFullScreen;
 
-        public PreviewViewModel(IFolderPicker folderPicker)
+        public PreviewViewModel(IFolderPicker folderPicker, IFileStorageService storageService)
         {
             _folderPicker = folderPicker;
+            _storageService = storageService;
+            LoadSavedFilesAsync()
+                .FireAndForget(ex => Debug.WriteLine($"Ошибка загрузки: {ex}"));
+        }
+
+        private async Task LoadSavedFilesAsync()
+        {
+            var files = await _storageService.LoadFilesAsync();
+
+            LoadedFiles.Clear();
+            foreach (var model in files)
+            {
+                var viewModel = new ImageItemViewModel(model);
+                LoadedFiles.Add(viewModel);
+                LoadImageAsync(viewModel)
+                    .FireAndForget(ex => Debug.WriteLine($"Ошибка загрузки: {ex}"));
+            }
+        }
+
+        private async Task LoadImageAsync(ImageItemViewModel item)
+        {
+            var FileFullName = (!string.IsNullOrEmpty(item.FileName) && !string.IsNullOrEmpty(item.FilePath))
+                ? Path.Combine(item.FilePath, item.FileName) : null;
+
+            if (FileFullName != null)
+            {
+                var imageSource = ImageSource.FromFile(FileFullName);
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    item.FilePreview = imageSource;
+                });
+            }
         }
 
         [RelayCommand]
@@ -50,19 +87,38 @@ namespace ImageClassifier.ViewModel.ViewModels
                     }
 
                     SelectedImage = ImageSource.FromStream(() => new MemoryStream(imageBytes));
-                    LoadedFiles.Add(new ImageItemViewModel 
+
+                    var LoadedFile = new ImageItemViewModel
                     {
                         FileName = image.FileName,
                         FilePath = Path.GetDirectoryName(image.FullPath),
                         FilePreview = SelectedImage,
                         Extension = Path.GetExtension(image.FileName)
-                    });
+                    };
+
+                    LoadedFiles.Add(LoadedFile);
+                    await SaveFilesAsync();
                 }
             }
-            catch 
+            catch
             {
                 Application.Current?.Windows[0].Page?.DisplayAlert("Ошибка", "Не удалось загрузить файл", "OK");
             }
+        }
+
+        private async Task SaveFilesAsync()
+        {
+            List<ImageItemModel> LoadedFilesModel = new();
+            foreach (var file in LoadedFiles)
+            {
+                LoadedFilesModel.Add(new ImageItemModel
+                {
+                    FileName = file.FileName,
+                    FilePath = file.FilePath,
+                    LastModified = DateTime.Now
+                });
+            }
+            await _storageService.SaveFilesAsync(LoadedFilesModel);
         }
 
         [RelayCommand]
@@ -83,7 +139,7 @@ namespace ImageClassifier.ViewModel.ViewModels
                     await LoadFilesFromFolderAsync(CurrentFolderPath);
                 }
             }
-            catch 
+            catch
             {
                 Application.Current?.Windows[0].Page?.DisplayAlert("Ошибка", "Не удалось загрузить файлы", "OK");
             }
@@ -114,6 +170,8 @@ namespace ImageClassifier.ViewModel.ViewModels
 
             foreach (var item in fileItems)
                 LoadedFiles.Add(item);
+
+            await SaveFilesAsync();
         }
 
         private bool IsImageFile(string extension)
@@ -130,7 +188,7 @@ namespace ImageClassifier.ViewModel.ViewModels
         }
 
         [RelayCommand]
-        private void FullscreenTapped() 
+        private void FullscreenTapped()
         {
             IsFullScreen = false;
             SelectedImage = null;

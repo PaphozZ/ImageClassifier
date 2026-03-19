@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Maui.Storage;
+using System.Runtime.Versioning;
 
-namespace ImageClassifier.Infrastructure
+namespace ImageClassifier.Infrastructure.Services
 {
+    [SupportedOSPlatform("windows")]
     public class DeferredFolderPicker : IFolderPicker
     {
         private IFolderPicker? _inner;

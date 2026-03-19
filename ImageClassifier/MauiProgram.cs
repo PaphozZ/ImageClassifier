@@ -1,13 +1,16 @@
 ﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
+using ImageClassifier.Core.Interfaces;
 using ImageClassifier.Extensions;
+using ImageClassifier.Infrastructure.Services;
 using Microsoft.Extensions.Logging;
-using ImageClassifier.Infrastructure;
+using System.Runtime.Versioning;
 
 namespace ImageClassifier
 {
     public static class MauiProgram
     {
+        [SupportedOSPlatform("windows")]
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
@@ -21,7 +24,8 @@ namespace ImageClassifier
                 })
                 .Services
                     .AddViewModels()
-                    .AddSingleton<IFolderPicker, DeferredFolderPicker>();
+                    .AddSingleton<IFolderPicker, DeferredFolderPicker>()
+                    .AddSingleton<IFileStorageService, JsonFileStorageService>();
 
 #if DEBUG
     		builder.Logging.AddDebug();
