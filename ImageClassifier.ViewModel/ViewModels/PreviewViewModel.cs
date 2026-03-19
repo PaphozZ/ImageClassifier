@@ -19,6 +19,9 @@ namespace ImageClassifier.ViewModel.ViewModels
         [ObservableProperty]
         private string? _currentFolderPath;
 
+        [ObservableProperty]
+        private bool _isFullScreen;
+
         public PreviewViewModel(IFolderPicker folderPicker)
         {
             _folderPicker = folderPicker;
@@ -47,7 +50,13 @@ namespace ImageClassifier.ViewModel.ViewModels
                     }
 
                     SelectedImage = ImageSource.FromStream(() => new MemoryStream(imageBytes));
-                    LoadedFiles.Add(new ImageItemViewModel { FilePreview = SelectedImage });
+                    LoadedFiles.Add(new ImageItemViewModel 
+                    {
+                        FileName = image.FileName,
+                        FilePath = Path.GetDirectoryName(image.FullPath),
+                        FilePreview = SelectedImage,
+                        Extension = Path.GetExtension(image.FileName)
+                    });
                 }
             }
             catch 
@@ -95,7 +104,7 @@ namespace ImageClassifier.ViewModel.ViewModels
                         Images.Add(new ImageItemViewModel
                         {
                             FileName = item.Name,
-                            FilePath = item.FullName,
+                            FilePath = item.DirectoryName,
                             FilePreview = ImageSource.FromFile(item.FullName),
                             Extension = item.Extension
                         });
@@ -117,6 +126,14 @@ namespace ImageClassifier.ViewModel.ViewModels
         private void SelectFile(ImageItemViewModel file)
         {
             SelectedImage = file.FilePreview;
+            IsFullScreen = true;
+        }
+
+        [RelayCommand]
+        private void FullscreenTapped() 
+        {
+            IsFullScreen = false;
+            SelectedImage = null;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using ImageClassifier.ViewModel.ViewModels;
-using CommunityToolkit.Maui.Storage;
+﻿using CommunityToolkit.Maui.Storage;
 
 namespace ImageClassifier.Infrastructure
 {
