@@ -20,6 +20,7 @@ namespace ImageClassifier.ViewModel.ViewModels
 
         private readonly IFolderPicker _folderPicker;
         private readonly IFileStorageService _storageService;
+        private readonly IDialogService _dialogService;
 
         [ObservableProperty]
         private string? _currentFolderPath;
@@ -27,10 +28,11 @@ namespace ImageClassifier.ViewModel.ViewModels
         [ObservableProperty]
         private bool _isFullScreen;
 
-        public PreviewViewModel(IFolderPicker folderPicker, IFileStorageService storageService)
+        public PreviewViewModel(IFolderPicker folderPicker, IFileStorageService storageService, IDialogService dialogService)
         {
             _folderPicker = folderPicker;
             _storageService = storageService;
+            _dialogService = dialogService;
             LoadSavedFilesAsync()
                 .FireAndForget(ex => Debug.WriteLine($"Ошибка загрузки: {ex}"));
         }
@@ -102,7 +104,7 @@ namespace ImageClassifier.ViewModel.ViewModels
             }
             catch
             {
-                Application.Current?.Windows[0].Page?.DisplayAlert("Ошибка", "Не удалось загрузить файл", "OK");
+                await _dialogService.DisplayAlert("Ошибка", "Не удалось загрузить файл", "OK");
             }
         }
 
@@ -141,7 +143,7 @@ namespace ImageClassifier.ViewModel.ViewModels
             }
             catch
             {
-                Application.Current?.Windows[0].Page?.DisplayAlert("Ошибка", "Не удалось загрузить файлы", "OK");
+                await _dialogService.DisplayAlert("Ошибка", "Не удалось загрузить файлы", "OK");
             }
         }
 
