@@ -38,14 +38,12 @@ public partial class PreviewViewModel : ObservableObject
             });
     }
 
-    private Task LoadSavedFilesAsync()
+    private async Task LoadSavedFilesAsync()
     {
         foreach (var item in FileCollection.Files)
         {
-            LoadImageAsync(item)
-                .FireAndForget(ex => Debug.WriteLine($"Ошибка загрузки: {ex}"));
+            await LoadImageAsync(item);
         }
-        return Task.CompletedTask;
     }
 
     private async Task LoadImageAsync(ImageItemViewModel item)
