@@ -5,9 +5,11 @@
              x:Class="ImageClassifier.Views.PreviewView"
              xmlns:c="clr-namespace:ImageClassifier.Converters"
              x:DataType="vm:PreviewViewModel">
+    
     <ContentView.Resources>
         <c:WidthToColumnCountConverter x:Key="WidthToColumnCountConverter" />
     </ContentView.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -20,8 +22,8 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            
-            <CollectionView ItemsSource="{Binding LoadedFiles}"
+
+            <CollectionView ItemsSource="{Binding FileCollection.Files}"
                             Margin="10"
                             VerticalScrollBarVisibility="Always"
                             Background="White">
@@ -91,13 +93,13 @@
         </Grid>
 
         <Grid Grid.ColumnSpan="2"
-              IsVisible="{Binding IsFullScreen}"
+              IsVisible="{Binding Fullscreen.IsVisible}"
               BackgroundColor="#80000000">
             <Grid.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding FullscreenTappedCommand}"
                                       CommandParameter="{Binding .}" />
             </Grid.GestureRecognizers>
-            <Image Source="{Binding SelectedImage}"/>
+            <Image Source="{Binding Fullscreen.SelectedImage}"/>
         </Grid>
     </Grid>
 </ContentView>

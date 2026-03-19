@@ -10,9 +10,11 @@ namespace ImageClassifier.Extensions
     {
         public static IServiceCollection AddViewModels(this IServiceCollection services)
         {
-            services.AddSingleton<MainViewModel>();
-            services.AddSingleton<SampleViewModel>();
-            services.AddSingleton<PreviewViewModel>();
+            services.AddTransient<MainViewModel>();
+            services.AddTransient<SampleViewModel>();
+            services.AddTransient<PreviewViewModel>();
+            services.AddTransient<FileCollectionViewModel>();
+            services.AddTransient<FullscreenViewModel>();
             return services;
         }
 
@@ -22,6 +24,8 @@ namespace ImageClassifier.Extensions
             services.AddSingleton<IFolderPicker, DeferredFolderPicker>();
             services.AddSingleton<IFileStorageService, JsonFileStorageService>();
             services.AddSingleton<IDialogService, MauiDialogService>();
+            services.AddSingleton<IMediaPickerService, MediaPickerService>();
+            services.AddSingleton<IFileScanner, FileScanner>();
             return services;
         }
     }
