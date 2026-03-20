@@ -10,9 +10,21 @@ namespace ImageClassifier.ViewModel.ViewModels
         [ObservableProperty]
         private bool _isVisible;
 
-        public void ShowImage(ImageSource imageSource)
+        public async Task ShowImageAsync(ImageItemViewModel file)
         {
-            SelectedImage = imageSource;
+            {
+                var FileFullName = (!string.IsNullOrEmpty(file.FileName) && !string.IsNullOrEmpty(file.FilePath))
+                ? Path.Combine(file.FilePath, file.FileName) : null;
+
+                if (FileFullName != null)
+                {
+                    var imageSource = ImageSource.FromFile(FileFullName);
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        SelectedImage = imageSource;
+                    });
+                }
+            }
             IsVisible = true;
         }
 

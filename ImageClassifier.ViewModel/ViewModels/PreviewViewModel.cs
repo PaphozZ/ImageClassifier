@@ -30,30 +30,8 @@ public partial class PreviewViewModel : ObservableObject
         _dialogService = dialogService;
         _mediaPickerService = mediaPickerService;
 
-        Task.Run(() => FileCollection.LoadSavedFilesAsync())
-            .ContinueWith(task =>
-            {
-                LoadImagesAsync()
-                    .FireAndForget(ex => Debug.WriteLine($"Ошибка загрузки: {ex}"));
-            });
-    }
-
-    private async Task LoadImagesAsync()
-    {
-        foreach (var item in FileCollection.Files)
-        {
-            var FileFullName = (!string.IsNullOrEmpty(item.FileName) && !string.IsNullOrEmpty(item.FilePath))
-            ? Path.Combine(item.FilePath, item.FileName) : null;
-
-            if (FileFullName != null)
-            {
-                var imageSource = ImageSource.FromFile(FileFullName);
-                await MainThread.InvokeOnMainThreadAsync(() =>
-                {
-                    item.FilePreview = imageSource;
-                });
-            }
-        }
+        FileCollection.LoadSavedFilesAsync()
+            .FireAndForget(ex => Debug.WriteLine($"Ошибка загрузки: {ex}"));
     }
 
     [RelayCommand]
@@ -92,10 +70,10 @@ public partial class PreviewViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void SelectFile(ImageItemViewModel file)
+    private async Task SelectFile(ImageItemViewModel file)
     {
         if (file.FilePreview != null)
-            Fullscreen.ShowImage(file.FilePreview);
+            await Fullscreen.ShowImageAsync(file);
     }
 
     [RelayCommand]
