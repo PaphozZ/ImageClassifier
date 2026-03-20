@@ -9,6 +9,7 @@ namespace ImageClassifier.ViewModel.ViewModels;
 public partial class ImageItemViewModel : ObservableObject
 {
     private readonly IThumbnailService _thumbnailService;
+    private readonly ITaskCommanderService _taskCommanderService;
 
     public string FileName { get; }
     public string FilePath { get; }
@@ -18,17 +19,17 @@ public partial class ImageItemViewModel : ObservableObject
     [ObservableProperty]
     private ImageSource? _filePreview;
 
-    public ImageItemViewModel(ImageItemModel model, IThumbnailService thumbnailService)
+    public ImageItemViewModel(ImageItemModel model, IThumbnailService thumbnailService, ITaskCommanderService taskCommanderService)
     {
         _thumbnailService = thumbnailService;
+        _taskCommanderService = taskCommanderService;
 
         FileName = model.FileName;
         FilePath = model.FilePath;
         LastModified = model.LastModified;
         Size = model.Size;
 
-        LoadThumbnailAsync()
-            .FireAndForget(ex => Debug.WriteLine($"Ошибка загрузки: {ex}"));
+        _taskCommanderService.AddTask(() => LoadThumbnailAsync());
     }
 
     public async Task LoadThumbnailAsync()

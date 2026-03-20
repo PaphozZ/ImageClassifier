@@ -2,8 +2,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ImageClassifier.Core.Interfaces;
-using ImageClassifier.ViewModel.Extensions;
-using System.Diagnostics;
 using System.Runtime.Versioning;
 
 namespace ImageClassifier.ViewModel.ViewModels;
@@ -16,22 +14,24 @@ public partial class PreviewViewModel : ObservableObject
     private readonly IFolderPicker _folderPicker;
     private readonly IDialogService _dialogService;
     private readonly IMediaPickerService _mediaPickerService;
+    private readonly ITaskCommanderService _taskCommanderService;
 
     public PreviewViewModel(
         FileCollectionViewModel fileCollection,
         FullscreenViewModel fullscreen,
         IFolderPicker folderPicker,
         IDialogService dialogService,
-        IMediaPickerService mediaPickerService)
+        IMediaPickerService mediaPickerService,
+        ITaskCommanderService taskCommander)
     {
         FileCollection = fileCollection;
         Fullscreen = fullscreen;
         _folderPicker = folderPicker;
         _dialogService = dialogService;
         _mediaPickerService = mediaPickerService;
+        _taskCommanderService = taskCommander;
 
-        FileCollection.LoadSavedFilesAsync()
-            .FireAndForget(ex => Debug.WriteLine($"Ошибка загрузки: {ex}"));
+        _taskCommanderService.AddTask(() => FileCollection.LoadSavedFilesAsync());
     }
 
     [RelayCommand]
@@ -70,10 +70,10 @@ public partial class PreviewViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task SelectFile(ImageItemViewModel file)
+    private void SelectFile(ImageItemViewModel file)
     {
         if (file.FilePreview != null)
-            await Fullscreen.ShowImageAsync(file);
+            _taskCommanderService.AddTask(() => Fullscreen.ShowImageAsync(file), true);
     }
 
     [RelayCommand]
