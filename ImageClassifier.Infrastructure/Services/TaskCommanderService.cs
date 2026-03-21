@@ -13,11 +13,11 @@ public class TaskCommanderService : ITaskCommanderService
     private int _isProcessing = 0;
     private readonly object _semaphoreLock = new();
 
-    public bool IsProcessing { get => _isProcessing == 1; }
+    public bool IsProcessing => _isProcessing == 1;
 
-    public TaskCommanderService(int maxConcurrency = 1)
+    public TaskCommanderService(int maxConcurrency)
     {
-        _maxConcurrency = maxConcurrency;
+        _maxConcurrency = Math.Max(maxConcurrency, 1);
         _semaphore = new SemaphoreSlim(maxConcurrency);
     }
 
@@ -49,7 +49,7 @@ public class TaskCommanderService : ITaskCommanderService
         while (true)
         {
             SemaphoreSlim currentSemaphore;
-            lock (_semaphoreLock) 
+            lock (_semaphoreLock)
                 currentSemaphore = _semaphore;
 
             await currentSemaphore.WaitAsync();

@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using ImageClassifier.Core.Enums;
 using ImageClassifier.Core.Interfaces;
 using ImageClassifier.Core.Models;
-using ImageClassifier.ViewModel.Extensions;
-using System.Diagnostics;
 
 namespace ImageClassifier.ViewModel.ViewModels;
 
@@ -17,6 +16,9 @@ public partial class ImageItemViewModel : ObservableObject
     public long Size { get; }
 
     [ObservableProperty]
+    private DatasetClass _datasetClass = DatasetClass.None;
+
+    [ObservableProperty]
     private ImageSource? _filePreview;
 
     public ImageItemViewModel(ImageItemModel model, IThumbnailService thumbnailService, ITaskCommanderService taskCommanderService)
@@ -29,7 +31,7 @@ public partial class ImageItemViewModel : ObservableObject
         LastModified = model.LastModified;
         Size = model.Size;
 
-        _taskCommanderService.AddTask(() => LoadThumbnailAsync());
+        _taskCommanderService.AddTask(LoadThumbnailAsync);
     }
 
     public async Task LoadThumbnailAsync()

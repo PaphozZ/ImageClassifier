@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ImageClassifier.ViewModel.ViewModels;assembly=ImageClassifier.ViewModel"
+             x:Class="ImageClassifier.Views.SidePanelView"
+             x:DataType="vm:PreviewViewModel">
+    <Grid BackgroundColor="LightGray">
+        <Grid Padding="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0"
+                  BackgroundColor="LightGray">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Border Grid.Row="1"
+                        HeightRequest="160"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="LightGreen"
+                        Margin="10">
+                    <Border.GestureRecognizers>
+                        <DropGestureRecognizer DropCommand="{Binding DropToPositiveItemsCommand}" />
+                    </Border.GestureRecognizers>
+                    <Label HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"
+                           Text="{Binding PositiveItems.Count}"
+                           FontSize="72" />
+                </Border>
+            </Grid>
+
+            <Grid Grid.Row="2"
+                  RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0"
+                        Text="Загрузить файл"
+                        Command="{Binding PickImageCommand}" />
+                <Button Grid.Row="1"
+                        Text="Загрузить папку"
+                        Command="{Binding PickFolderCommand}" />
+            </Grid>
+
+            <Grid Grid.Row="4"
+                  BackgroundColor="LightGray">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Border Grid.Row="1"
+                        HeightRequest="160"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="IndianRed"
+                        Margin="10"
+                        Padding="10">
+                    <Border.GestureRecognizers>
+                        <DropGestureRecognizer DropCommand="{Binding DropToNegativeItemsCommand}" />
+                    </Border.GestureRecognizers>
+                    <Label HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"
+                           Text="{Binding NegativeItems.Count}"
+                           FontSize="72" />
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentView>

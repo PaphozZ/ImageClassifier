@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ImageClassifier.ViewModel.ViewModels;assembly=ImageClassifier.ViewModel"
+             xmlns:c="clr-namespace:ImageClassifier.Converters"
+             x:Class="ImageClassifier.Views.ImageListView"
+             x:DataType="vm:PreviewViewModel">
+    <ContentView.Resources>
+        <c:WidthToColumnCountConverter x:Key="WidthToColumnCountConverter" />
+        <c:DatasetClassToIconConverter x:Key="DatasetClassToIconConverter" />
+    </ContentView.Resources>
+
+    <Grid x:Name="PreviewGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <CollectionView ItemsSource="{Binding FileCollection.Files}"
+                        Margin="10"
+                        VerticalScrollBarVisibility="Always"
+                        Background="White">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical"
+                                 Span="{Binding Width, Source={x:Reference PreviewGrid}, Converter={StaticResource WidthToColumnCountConverter}, ConverterParameter=360, x:DataType=Grid}" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:ImageItemViewModel">
+                    <Grid Padding="10"
+                          ColumnDefinitions="80, *"
+                          RowDefinitions="Auto, Auto">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PreviewViewModel}}, Path=SelectFileCommand, x:DataType=vm:PreviewViewModel}"
+                                                  CommandParameter="{Binding .}" />
+                            <DragGestureRecognizer DragStartingCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:PreviewViewModel}}, Path=DragStartingCommand, x:DataType=vm:PreviewViewModel}"
+                                                   DragStartingCommandParameter="{Binding .}" />
+                        </Grid.GestureRecognizers>
+
+                        <Image Grid.RowSpan="2"
+                               Source="{Binding FilePreview}"
+                               Aspect="AspectFill"
+                               HeightRequest="70"
+                               WidthRequest="70"
+                               Margin="0,0,10,0" />
+
+                        <Image Source="{Binding DatasetClass, Converter={StaticResource DatasetClassToIconConverter}}"
+                               HorizontalOptions="End"
+                               VerticalOptions="Start"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               Margin="5" />
+
+                        <Label Grid.Column="1"
+                               Grid.Row="0"
+                               Text="{Binding FileName}"
+                               FontAttributes="Bold"
+                               LineBreakMode="TailTruncation" />
+
+                        <Label Grid.Column="1"
+                               Grid.Row="1"
+                               Text="{Binding FilePath}"
+                               FontSize="Micro"
+                               TextColor="Gray"
+                               LineBreakMode="TailTruncation" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentView>

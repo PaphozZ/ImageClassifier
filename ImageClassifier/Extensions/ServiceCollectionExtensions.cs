@@ -27,7 +27,7 @@ namespace ImageClassifier.Extensions
             services.AddSingleton<IMediaPickerService, MediaPickerService>();
             services.AddSingleton<IFileScanner, FileScanner>();
             services.AddSingleton<IThumbnailService, ThumbnailService>();
-            services.AddSingleton<ITaskCommanderService>(sp => new TaskCommanderService(3));
+            services.AddSingleton<ITaskCommanderService>(sp => new TaskCommanderService(Environment.ProcessorCount - 1));
             return services;
         }
     }

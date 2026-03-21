@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ImageClassifier.Core.Enums;
 using ImageClassifier.Core.Interfaces;
+using System.Collections.ObjectModel;
 using System.Runtime.Versioning;
 
 namespace ImageClassifier.ViewModel.ViewModels;
@@ -15,6 +17,13 @@ public partial class PreviewViewModel : ObservableObject
     private readonly IDialogService _dialogService;
     private readonly IMediaPickerService _mediaPickerService;
     private readonly ITaskCommanderService _taskCommanderService;
+
+    private ImageItemViewModel? _draggedItem;
+
+    [ObservableProperty]
+    private ObservableCollection<ImageItemViewModel> _positiveItems = new();
+    [ObservableProperty]
+    private ObservableCollection<ImageItemViewModel> _negativeItems = new();
 
     public PreviewViewModel(
         FileCollectionViewModel fileCollection,
@@ -31,7 +40,7 @@ public partial class PreviewViewModel : ObservableObject
         _mediaPickerService = mediaPickerService;
         _taskCommanderService = taskCommander;
 
-        _taskCommanderService.AddTask(() => FileCollection.LoadSavedFilesAsync());
+        _taskCommanderService.AddTask(FileCollection.LoadSavedFilesAsync);
     }
 
     [RelayCommand]
@@ -78,4 +87,36 @@ public partial class PreviewViewModel : ObservableObject
 
     [RelayCommand]
     private void FullscreenTapped() => Fullscreen.Hide();
+
+    [RelayCommand]
+    private void DragStarting(ImageItemViewModel item)
+    {
+        _draggedItem = item;
+    }
+
+    [RelayCommand]
+    private void DropToPositiveItems()
+    {
+        if (_draggedItem != null && !PositiveItems.Contains(_draggedItem))
+        {
+            PositiveItems.Add(_draggedItem);
+            if (NegativeItems.Contains(_draggedItem))
+                NegativeItems.Remove(_draggedItem);
+            _draggedItem.DatasetClass = DatasetClass.Positive;
+            _draggedItem = null;
+        }
+    }
+
+    [RelayCommand]
+    private void DropToNegativeItems()
+    {
+        if (_draggedItem != null && !NegativeItems.Contains(_draggedItem))
+        {
+            NegativeItems.Add(_draggedItem);
+            if(PositiveItems.Contains(_draggedItem))
+                PositiveItems.Remove(_draggedItem);
+            _draggedItem.DatasetClass = DatasetClass.Negative;
+            _draggedItem = null;
+        }
+    }
 }
