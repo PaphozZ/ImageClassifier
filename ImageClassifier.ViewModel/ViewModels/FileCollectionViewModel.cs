@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using ImageClassifier.Core.Enums;
 using ImageClassifier.Core.Interfaces;
 using ImageClassifier.Core.Models;
 using System.Collections.ObjectModel;
@@ -16,9 +17,9 @@ namespace ImageClassifier.ViewModel.ViewModels
         private ObservableCollection<ImageItemViewModel> _files = new();
 
         public FileCollectionViewModel(
-            IFileStorageService storageService, 
-            IFileScanner fileScanner, 
-            IThumbnailService thumbnailService, 
+            IFileStorageService storageService,
+            IFileScanner fileScanner,
+            IThumbnailService thumbnailService,
             ITaskCommanderService taskCommanderService)
         {
             _storageService = storageService;
@@ -49,9 +50,23 @@ namespace ImageClassifier.ViewModel.ViewModels
             await SaveAsync();
         }
 
+        public void RemoveFile(ImageItemViewModel item)
+        {
+            item.FilePreview = ImageSource.FromFile("waste_basket.png");
+            item.IsDeleted = true;
+            _taskCommanderService.AddTask(SaveAsync, true);
+        }
+
+        public void ResetDatasetClasses()
+        {
+            foreach (var file in Files)
+                file.DatasetClass = DatasetClass.None;
+        }
+
         private async Task SaveAsync()
         {
-            var models = Files.Select(f => f.ToModel()).ToList();
+            var files = Files.Where(f => !f.IsDeleted);
+            var models = files.Select(f => f.ToModel()).ToList();
             await _storageService.SaveFilesAsync(models);
         }
     }

@@ -7,7 +7,7 @@
     <Grid BackgroundColor="LightGray">
         <Grid Padding="20">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="200" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -15,7 +15,8 @@
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0"
-                  BackgroundColor="LightGray">
+                  BackgroundColor="LightGray"
+                  IsVisible="{Binding IsLearningMode}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -24,9 +25,13 @@
                         HeightRequest="160"
                         StrokeShape="RoundRectangle 10"
                         BackgroundColor="LightGreen"
-                        Margin="10">
+                        Margin="10"
+                        StrokeDashArray="6,5"
+                        StrokeThickness="2"
+                        Stroke="Black">
                     <Border.GestureRecognizers>
                         <DropGestureRecognizer DropCommand="{Binding DropToPositiveItemsCommand}" />
+                        <TapGestureRecognizer Command="{Binding RemoveLastPositiveItemCommand}" />
                     </Border.GestureRecognizers>
                     <Label HorizontalTextAlignment="Center"
                            VerticalTextAlignment="Center"
@@ -40,6 +45,9 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Button Grid.Row="0"
                         Text="Загрузить файл"
@@ -47,6 +55,16 @@
                 <Button Grid.Row="1"
                         Text="Загрузить папку"
                         Command="{Binding PickFolderCommand}" />
+                <Border Grid.Row="2"
+                        HeightRequest="1"
+                        BackgroundColor="Transparent"
+                        StrokeThickness="1"
+                        Stroke="Gray" />
+                <Button Grid.Row="3"
+                        Text="{Binding LearningButtonText}"
+                        Command="{Binding LearningModeCommand}" />
+                <Button Grid.Row="4"
+                        Text="" />
             </Grid>
 
             <Grid Grid.Row="4"
@@ -60,14 +78,26 @@
                         StrokeShape="RoundRectangle 10"
                         BackgroundColor="IndianRed"
                         Margin="10"
-                        Padding="10">
+                        Padding="10"
+                        StrokeDashArray="6,5"
+                        StrokeThickness="2"
+                        Stroke="Black">
                     <Border.GestureRecognizers>
                         <DropGestureRecognizer DropCommand="{Binding DropToNegativeItemsCommand}" />
+                        <TapGestureRecognizer Command="{Binding RemoveLastNegativeItemCommand}" />
                     </Border.GestureRecognizers>
-                    <Label HorizontalTextAlignment="Center"
-                           VerticalTextAlignment="Center"
-                           Text="{Binding NegativeItems.Count}"
-                           FontSize="72" />
+                    <Grid>
+                        <Label HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center"
+                               Text="{Binding NegativeItems.Count}"
+                               FontSize="72"
+                               IsVisible="{Binding IsLearningMode}" />
+                        <Image Grid.Row="1"
+                               Source="waste_basket.png"
+                               Aspect="AspectFill"
+                               IsVisible="{Binding IsPreviewMode}">
+                        </Image>
+                    </Grid>
                 </Border>
             </Grid>
         </Grid>

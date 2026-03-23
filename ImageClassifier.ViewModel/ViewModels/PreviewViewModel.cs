@@ -21,6 +21,14 @@ public partial class PreviewViewModel : ObservableObject
     private ImageItemViewModel? _draggedItem;
 
     [ObservableProperty]
+    private string? _learningButtonText = "Обучение";
+
+    [ObservableProperty]
+    private bool _isLearningMode;
+    [ObservableProperty]
+    private bool _isPreviewMode = true;
+
+    [ObservableProperty]
     private ObservableCollection<ImageItemViewModel> _positiveItems = new();
     [ObservableProperty]
     private ObservableCollection<ImageItemViewModel> _negativeItems = new();
@@ -97,7 +105,7 @@ public partial class PreviewViewModel : ObservableObject
     [RelayCommand]
     private void DropToPositiveItems()
     {
-        if (_draggedItem != null && !PositiveItems.Contains(_draggedItem))
+        if (_draggedItem != null && !_draggedItem.IsDeleted && !PositiveItems.Contains(_draggedItem))
         {
             PositiveItems.Add(_draggedItem);
             if (NegativeItems.Contains(_draggedItem))
@@ -110,13 +118,60 @@ public partial class PreviewViewModel : ObservableObject
     [RelayCommand]
     private void DropToNegativeItems()
     {
-        if (_draggedItem != null && !NegativeItems.Contains(_draggedItem))
+        if (_draggedItem != null && !_draggedItem.IsDeleted && !NegativeItems.Contains(_draggedItem))
         {
-            NegativeItems.Add(_draggedItem);
-            if(PositiveItems.Contains(_draggedItem))
-                PositiveItems.Remove(_draggedItem);
-            _draggedItem.DatasetClass = DatasetClass.Negative;
-            _draggedItem = null;
+            if (IsPreviewMode) 
+            {
+                FileCollection.RemoveFile(_draggedItem);
+                _draggedItem = null;
+            }
+            else
+            {
+                NegativeItems.Add(_draggedItem);
+                if (PositiveItems.Contains(_draggedItem))
+                    PositiveItems.Remove(_draggedItem);
+                _draggedItem.DatasetClass = DatasetClass.Negative;
+                _draggedItem = null;
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void LearningMode(ImageItemViewModel file)
+    {
+        IsLearningMode = !IsLearningMode;
+        IsPreviewMode = !IsPreviewMode;
+
+        if (IsLearningMode)
+            LearningButtonText = "Назад";
+        else
+        {
+            PositiveItems.Clear();
+            NegativeItems.Clear();
+            FileCollection.ResetDatasetClasses();
+            LearningButtonText = "Обучение";
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveLastPositiveItem()
+    {
+        var lastItem = PositiveItems.LastOrDefault();
+        if (lastItem != null)
+        {
+            lastItem.DatasetClass = DatasetClass.None;
+            PositiveItems.Remove(lastItem);
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveLastNegativeItem()
+    {
+        var lastItem = NegativeItems.LastOrDefault();
+        if (lastItem != null)
+        {
+            lastItem.DatasetClass = DatasetClass.None;
+            NegativeItems.Remove(lastItem);
         }
     }
 }

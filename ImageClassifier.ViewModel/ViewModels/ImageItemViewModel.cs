@@ -16,6 +16,9 @@ public partial class ImageItemViewModel : ObservableObject
     public long Size { get; }
 
     [ObservableProperty]
+    private bool _isDeleted;
+
+    [ObservableProperty]
     private DatasetClass _datasetClass = DatasetClass.None;
 
     [ObservableProperty]
@@ -37,7 +40,7 @@ public partial class ImageItemViewModel : ObservableObject
     public async Task LoadThumbnailAsync()
     {
         var fullPath = Path.Combine(FilePath, FileName);
-        if (File.Exists(fullPath))
+        if (!IsDeleted && File.Exists(fullPath))
         {
             var bytes = await _thumbnailService.GenerateThumbnailAsync(fullPath);
             if (bytes != null)
