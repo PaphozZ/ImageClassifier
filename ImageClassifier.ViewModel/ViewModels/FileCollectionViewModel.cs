@@ -50,17 +50,18 @@ namespace ImageClassifier.ViewModel.ViewModels
             await SaveAsync();
         }
 
-        public void RemoveFile(ImageItemViewModel item)
+        public async Task RemoveFileAsync(ImageItemViewModel item)
         {
             item.FilePreview = ImageSource.FromFile("waste_basket.png");
             item.IsDeleted = true;
-            _taskCommanderService.AddTask(SaveAsync, true);
+            await SaveAsync();
         }
 
-        public void ResetDatasetClasses()
+        public Task ResetDatasetClasses()
         {
             foreach (var file in Files)
                 file.DatasetClass = DatasetClass.None;
+            return Task.CompletedTask;
         }
 
         private async Task SaveAsync()

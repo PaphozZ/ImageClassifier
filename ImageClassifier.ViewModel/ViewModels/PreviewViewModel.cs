@@ -116,14 +116,13 @@ public partial class PreviewViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void DropToNegativeItems()
+    private async Task DropToNegativeItems()
     {
         if (_draggedItem != null && !_draggedItem.IsDeleted && !NegativeItems.Contains(_draggedItem))
         {
             if (IsPreviewMode) 
             {
-                FileCollection.RemoveFile(_draggedItem);
-                _draggedItem = null;
+                await FileCollection.RemoveFileAsync(_draggedItem); 
             }
             else
             {
@@ -131,8 +130,8 @@ public partial class PreviewViewModel : ObservableObject
                 if (PositiveItems.Contains(_draggedItem))
                     PositiveItems.Remove(_draggedItem);
                 _draggedItem.DatasetClass = DatasetClass.Negative;
-                _draggedItem = null;
             }
+            _draggedItem = null;
         }
     }
 
@@ -148,7 +147,7 @@ public partial class PreviewViewModel : ObservableObject
         {
             PositiveItems.Clear();
             NegativeItems.Clear();
-            FileCollection.ResetDatasetClasses();
+            _taskCommanderService.AddTask(FileCollection.ResetDatasetClasses, true);
             LearningButtonText = "Обучение";
         }
     }
