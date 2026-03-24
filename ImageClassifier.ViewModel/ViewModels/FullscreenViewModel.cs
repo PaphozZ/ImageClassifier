@@ -13,12 +13,9 @@ namespace ImageClassifier.ViewModel.ViewModels
         public async Task ShowImageAsync(ImageItemViewModel file)
         {
             {
-                var FileFullName = (!string.IsNullOrEmpty(file.FileName) && !string.IsNullOrEmpty(file.FilePath))
-                ? Path.Combine(file.FilePath, file.FileName) : null;
-
-                if (FileFullName != null)
+                if (file.FullPath != null)
                 {
-                    var imageSource = ImageSource.FromFile(FileFullName);
+                    var imageSource = ImageSource.FromFile(file.FullPath);
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {
                         SelectedImage = imageSource;

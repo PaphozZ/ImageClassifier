@@ -12,6 +12,8 @@ public partial class ImageItemViewModel : ObservableObject
 
     public string FileName { get; }
     public string FilePath { get; }
+    public string FullPath { get; }
+
     public DateTime LastModified { get; }
     public long Size { get; }
 
@@ -31,6 +33,7 @@ public partial class ImageItemViewModel : ObservableObject
 
         FileName = model.FileName;
         FilePath = model.FilePath;
+        FullPath = model.FullPath;
         LastModified = model.LastModified;
         Size = model.Size;
 
@@ -39,10 +42,9 @@ public partial class ImageItemViewModel : ObservableObject
 
     public async Task LoadThumbnailAsync()
     {
-        var fullPath = Path.Combine(FilePath, FileName);
-        if (!IsDeleted && File.Exists(fullPath))
+        if (!IsDeleted && File.Exists(FullPath))
         {
-            var bytes = await _thumbnailService.GenerateThumbnailAsync(fullPath);
+            var bytes = await _thumbnailService.GenerateThumbnailAsync(FullPath);
             if (bytes != null)
             {
                 await MainThread.InvokeOnMainThreadAsync(() =>
@@ -59,6 +61,7 @@ public partial class ImageItemViewModel : ObservableObject
         {
             FileName = FileName,
             FilePath = FilePath,
+            FullPath = FullPath,
             LastModified = LastModified,
             Size = Size
         };

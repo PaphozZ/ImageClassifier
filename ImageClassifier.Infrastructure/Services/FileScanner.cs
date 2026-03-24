@@ -20,6 +20,7 @@ public class FileScanner : IFileScanner
                 {
                     FileName = f.Name,
                     FilePath = f.DirectoryName ?? string.Empty,
+                    FullPath = f.FullName,
                     LastModified = f.LastWriteTime,
                     Size = f.Length
                 });

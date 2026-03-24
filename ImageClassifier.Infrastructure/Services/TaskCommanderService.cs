@@ -15,10 +15,21 @@ public class TaskCommanderService : ITaskCommanderService
 
     public bool IsProcessing => _isProcessing == 1;
 
+    private int _taskCount = 0;
+    private TaskCompletionSource<bool> _allTasksCompletion = new();
+
     public TaskCommanderService(int maxConcurrency)
     {
         _maxConcurrency = Math.Max(maxConcurrency, 1);
         _semaphore = new SemaphoreSlim(maxConcurrency);
+    }
+
+    public async Task WaitForAllAsync(CancellationToken cancellationToken = default)
+    {
+        using (cancellationToken.Register(() => _allTasksCompletion.TrySetCanceled(cancellationToken)))
+        {
+            await _allTasksCompletion.Task;
+        }
     }
 
     public void SetMaxConcurrency(int maxConcurrency)
@@ -33,6 +44,8 @@ public class TaskCommanderService : ITaskCommanderService
 
     public void AddTask(Func<Task> taskFactory, bool highPriority = false)
     {
+        _allTasksCompletion = new();
+
         if (highPriority)
             _highPriorityQueue.Enqueue(taskFactory);
         else
@@ -75,6 +88,7 @@ public class TaskCommanderService : ITaskCommanderService
 
     private async Task RunTaskAsync(Func<Task> taskFactory, SemaphoreSlim semaphore)
     {
+        Interlocked.Increment(ref _taskCount);
         try
         {
             await taskFactory();
@@ -86,6 +100,17 @@ public class TaskCommanderService : ITaskCommanderService
         finally
         {
             semaphore.Release();
+            if (Interlocked.Decrement(ref _taskCount) == 0)
+            {
+                if (_highPriorityQueue.IsEmpty && _lowPriorityQueue.IsEmpty)
+                {
+                    _allTasksCompletion.TrySetResult(true);
+                }
+                else
+                {
+                    _allTasksCompletion = new();
+                }
+            }
         }
     }
 }

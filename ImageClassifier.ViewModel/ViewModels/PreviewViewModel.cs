@@ -17,14 +17,17 @@ public partial class PreviewViewModel : ObservableObject
     private readonly IDialogService _dialogService;
     private readonly IMediaPickerService _mediaPickerService;
     private readonly ITaskCommanderService _taskCommanderService;
+    private readonly IModelTrainingService _modelTrainingService;
 
     private ImageItemViewModel? _draggedItem;
 
     [ObservableProperty]
-    private string? _learningButtonText = "Обучение";
+    private string? _trainButtonText = "Обучение";
+    [ObservableProperty]
+    private string? _predictButtonText = "";
 
     [ObservableProperty]
-    private bool _isLearningMode;
+    private bool _isTrainMode;
     [ObservableProperty]
     private bool _isPreviewMode = true;
 
@@ -39,7 +42,8 @@ public partial class PreviewViewModel : ObservableObject
         IFolderPicker folderPicker,
         IDialogService dialogService,
         IMediaPickerService mediaPickerService,
-        ITaskCommanderService taskCommander)
+        ITaskCommanderService taskCommander,
+        IModelTrainingService modelTrainingService)
     {
         FileCollection = fileCollection;
         Fullscreen = fullscreen;
@@ -47,6 +51,7 @@ public partial class PreviewViewModel : ObservableObject
         _dialogService = dialogService;
         _mediaPickerService = mediaPickerService;
         _taskCommanderService = taskCommander;
+        _modelTrainingService = modelTrainingService;
 
         _taskCommanderService.AddTask(FileCollection.LoadSavedFilesAsync);
     }
@@ -120,9 +125,9 @@ public partial class PreviewViewModel : ObservableObject
     {
         if (_draggedItem != null && !_draggedItem.IsDeleted && !NegativeItems.Contains(_draggedItem))
         {
-            if (IsPreviewMode) 
+            if (IsPreviewMode)
             {
-                await FileCollection.RemoveFileAsync(_draggedItem); 
+                await FileCollection.RemoveFileAsync(_draggedItem);
             }
             else
             {
@@ -136,19 +141,23 @@ public partial class PreviewViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void LearningMode(ImageItemViewModel file)
+    private void TrainMode(ImageItemViewModel file)
     {
-        IsLearningMode = !IsLearningMode;
+        IsTrainMode = !IsTrainMode;
         IsPreviewMode = !IsPreviewMode;
 
-        if (IsLearningMode)
-            LearningButtonText = "Назад";
+        if (IsTrainMode)
+        {
+            TrainButtonText = "Назад";
+            PredictButtonText = "Обучить!";
+        }
         else
         {
             PositiveItems.Clear();
             NegativeItems.Clear();
             _taskCommanderService.AddTask(FileCollection.ResetDatasetClasses, true);
-            LearningButtonText = "Обучение";
+            TrainButtonText = "Обучение";
+            PredictButtonText = "";
         }
     }
 
@@ -171,6 +180,24 @@ public partial class PreviewViewModel : ObservableObject
         {
             lastItem.DatasetClass = DatasetClass.None;
             NegativeItems.Remove(lastItem);
+        }
+    }
+
+    [RelayCommand]
+    private async Task Train()
+    {
+        if (IsTrainMode)
+        {
+            if (PositiveItems.Count > 0 && NegativeItems.Count > 0)
+            {
+                var positiveModels = PositiveItems.Select(f => f.ToModel());
+                var negativeModels = NegativeItems.Select(f => f.ToModel());
+                await _modelTrainingService.TrainAsync(positiveModels, negativeModels);
+            }
+            else
+            {
+                await _dialogService.DisplayAlert("Ошибка", "Выборки не могут быть пусты", "OK");
+            }
         }
     }
 }

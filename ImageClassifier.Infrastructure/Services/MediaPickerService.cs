@@ -16,6 +16,7 @@ public class MediaPickerService : IMediaPickerService
             {
                 FileName = image.FileName,
                 FilePath = Path.GetDirectoryName(image.FullPath) ?? string.Empty,
+                FullPath = image.FullPath,
                 LastModified = DateTime.Now
             };
         }
