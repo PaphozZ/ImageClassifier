@@ -89,7 +89,7 @@ public class ModelTrainingService : IModelTrainingService
             FeatureColumnName = "ImageBytes",
             MetricsCallback = (metrics) => Debug.WriteLine(metrics),
             WorkspacePath = _workSpacePath,
-            ResourcePath = _workSpacePath
+            ResourcePath = _workSpacePath //Модифицированная версия библиотеки
         };
 
         IDataView data = _mlContext.Data.LoadFromEnumerable(_imagesData);
