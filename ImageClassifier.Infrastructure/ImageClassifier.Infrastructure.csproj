@@ -1,23 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
-    <PackageReference Include="Microsoft.Data.Analysis" Version="0.24.0-dev.26166.1" />
-    <PackageReference Include="Microsoft.ML" Version="6.0.0-dev.26166.1" />
-    <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="6.0.0-dev.26166.1" />
-    <PackageReference Include="Microsoft.ML.Vision" Version="6.0.0-dev.26166.1" />
-    <PackageReference Include="SciSharp.TensorFlow.Redist" Version="2.16.0" />
-    <PackageReference Include="SkiaSharp" Version="3.119.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
+		<PackageReference Include="Microsoft.ML" Version="5.0.0" />
+		<PackageReference Include="Microsoft.ML.Vision" Version="5.0.0" />
+		<PackageReference Include="SciSharp.TensorFlow.Redist" Version="2.16.0" />
+		<PackageReference Include="SkiaSharp" Version="3.119.2" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ImageClassifier.Core\ImageClassifier.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\ImageClassifier.Core\ImageClassifier.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Microsoft.ML.Vision">
+			<HintPath>Microsoft.ML.Vision.dll</HintPath>
+		</Reference>
+		<None Update="Microsoft.ML.Vision.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>
