@@ -13,12 +13,12 @@ public class ModelTrainingService : IModelTrainingService
 {
     private readonly ITaskCommanderService _taskCommanderService;
     private readonly IDialogService _mauiDialogService;
-    private readonly ImageResizeService _imageResizeService;
+    private readonly IImageResizeService _imageResizeService;
 
     private readonly ConcurrentBag<ImageData> _imagesData = new();
     private readonly string _workSpacePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "model_workspace");
 
-    public ModelTrainingService(ITaskCommanderService taskCommanderService, IDialogService mauiDialogService, ImageResizeService imageResizeService)
+    public ModelTrainingService(ITaskCommanderService taskCommanderService, IDialogService mauiDialogService, IImageResizeService imageResizeService)
     {
         _taskCommanderService = taskCommanderService;
         _mauiDialogService = mauiDialogService;

@@ -3,20 +3,21 @@ using ImageClassifier.Core.Models;
 using ImageClassifier.Infrastructure.DTOs;
 using Microsoft.ML;
 using System.Collections.Concurrent;
+
 namespace ImageClassifier.Infrastructure.Services
 {
     public class PredictionService : IPredictionService
     {
         private readonly ITaskCommanderService _taskCommanderService;
         private readonly IDialogService _mauiDialogService;
-        private readonly ImageResizeService _imageResizeService;
+        private readonly IImageResizeService _imageResizeService;
 
         private readonly ConcurrentBag<ImageData> _imagesData = new();
         private readonly string _workSpacePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "model_workspace");
 
         public PredictionService(ITaskCommanderService taskCommanderService,
             IDialogService mauiDialogService,
-            ImageResizeService imageResizeService)
+            IImageResizeService imageResizeService)
         {
             _taskCommanderService = taskCommanderService;
             _mauiDialogService = mauiDialogService;
@@ -43,17 +44,20 @@ namespace ImageClassifier.Infrastructure.Services
             MLContext mlContext = new();
             ITransformer trainedModel = null!;
 
-            await PrepareImagesDataAsync(items);
-
             using (var stream = new FileStream(Path.Combine(_workSpacePath, "model.zip"), FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 trainedModel = mlContext.Model.Load(stream, out var modelSchema);
             }
-            if (trainedModel == null || _imagesData.Count == 0)
+            if (trainedModel == null || items.Count() == 0)
             {
                 await _mauiDialogService.DisplayAlert("Сообщение", "Сначала обучите модель и выберите изображения!", "OK");
                 return;
             }
+            if (_taskCommanderService.IsProcessing)
+            {
+                await _mauiDialogService.DisplayAlert("Сообщение", "Классификация начнется после завершения фоновых задач", "OK");
+            }
+            await PrepareImagesDataAsync(items);
 
             var predictionEngine = mlContext.Model.CreatePredictionEngine<ImageData, ModelOutput>(trainedModel);
 

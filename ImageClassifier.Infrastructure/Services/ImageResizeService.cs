@@ -5,7 +5,7 @@ namespace ImageClassifier.Infrastructure.Services;
 
 public class ImageResizeService : IImageResizeService
 {
-    public async Task<byte[]?> GenerateThumbnailAsync(string filePath, int minSize = 80)
+    public async Task<byte[]?> GenerateThumbnailAsync(string filePath, int minSize = 160)
     {
         return await Task.Run(() =>
         {
