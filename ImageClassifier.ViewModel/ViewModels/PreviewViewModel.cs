@@ -18,6 +18,7 @@ public partial class PreviewViewModel : ObservableObject
     private readonly IMediaPickerService _mediaPickerService;
     private readonly ITaskCommanderService _taskCommanderService;
     private readonly IModelTrainingService _modelTrainingService;
+    private readonly IPredictionService _predictionService;
 
     private ImageItemViewModel? _draggedItem;
 
@@ -43,7 +44,8 @@ public partial class PreviewViewModel : ObservableObject
         IDialogService dialogService,
         IMediaPickerService mediaPickerService,
         ITaskCommanderService taskCommander,
-        IModelTrainingService modelTrainingService)
+        IModelTrainingService modelTrainingService,
+        IPredictionService predictionService)
     {
         FileCollection = fileCollection;
         Fullscreen = fullscreen;
@@ -52,6 +54,7 @@ public partial class PreviewViewModel : ObservableObject
         _mediaPickerService = mediaPickerService;
         _taskCommanderService = taskCommander;
         _modelTrainingService = modelTrainingService;
+        _predictionService = predictionService;
 
         _taskCommanderService.AddTask(FileCollection.LoadSavedFilesAsync);
     }
@@ -198,6 +201,16 @@ public partial class PreviewViewModel : ObservableObject
             {
                 await _dialogService.DisplayAlert("Ошибка", "Выборки не могут быть пусты", "OK");
             }
+        }
+    }
+
+    [RelayCommand]
+    private async Task Predict()
+    {
+        if (IsTrainMode)
+        {
+            var positiveModels = PositiveItems.Select(f => f.ToModel());
+            await _predictionService.ApplyPredictionsAsync(positiveModels);
         }
     }
 }

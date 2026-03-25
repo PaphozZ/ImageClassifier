@@ -26,9 +26,10 @@ namespace ImageClassifier.Extensions
             services.AddSingleton<IDialogService, MauiDialogService>();
             services.AddSingleton<IMediaPickerService, MediaPickerService>();
             services.AddSingleton<IFileScanner, FileScanner>();
-            services.AddSingleton<IThumbnailService, ThumbnailService>();
+            services.AddSingleton<IImageResizeService, ImageResizeService>();
             services.AddSingleton<ITaskCommanderService>(sp => new TaskCommanderService(Environment.ProcessorCount - 1));
             services.AddSingleton<IModelTrainingService, ModelTrainingService>();
+            services.AddSingleton<IPredictionService, PredictionService>();
             return services;
         }
     }

@@ -21,7 +21,7 @@ public class TaskCommanderService : ITaskCommanderService
     public TaskCommanderService(int maxConcurrency)
     {
         _maxConcurrency = Math.Max(maxConcurrency, 1);
-        _semaphore = new SemaphoreSlim(maxConcurrency);
+        _semaphore = new(maxConcurrency);
     }
 
     public async Task WaitForAllAsync(CancellationToken cancellationToken = default)

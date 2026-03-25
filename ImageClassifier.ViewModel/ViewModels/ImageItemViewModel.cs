@@ -7,7 +7,7 @@ namespace ImageClassifier.ViewModel.ViewModels;
 
 public partial class ImageItemViewModel : ObservableObject
 {
-    private readonly IThumbnailService _thumbnailService;
+    private readonly IImageResizeService _imageResizeService;
     private readonly ITaskCommanderService _taskCommanderService;
 
     public string FileName { get; }
@@ -26,9 +26,9 @@ public partial class ImageItemViewModel : ObservableObject
     [ObservableProperty]
     private ImageSource? _filePreview;
 
-    public ImageItemViewModel(ImageItemModel model, IThumbnailService thumbnailService, ITaskCommanderService taskCommanderService)
+    public ImageItemViewModel(ImageItemModel model, IImageResizeService imageResizeService, ITaskCommanderService taskCommanderService)
     {
-        _thumbnailService = thumbnailService;
+        _imageResizeService = imageResizeService;
         _taskCommanderService = taskCommanderService;
 
         FileName = model.FileName;
@@ -44,7 +44,7 @@ public partial class ImageItemViewModel : ObservableObject
     {
         if (!IsDeleted && File.Exists(FullPath))
         {
-            var bytes = await _thumbnailService.GenerateThumbnailAsync(FullPath);
+            var bytes = await _imageResizeService.GenerateThumbnailAsync(FullPath);
             if (bytes != null)
             {
                 await MainThread.InvokeOnMainThreadAsync(() =>
