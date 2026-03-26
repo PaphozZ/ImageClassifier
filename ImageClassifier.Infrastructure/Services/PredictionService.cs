@@ -43,46 +43,57 @@ namespace ImageClassifier.Infrastructure.Services
             MLContext mlContext = new();
             ITransformer trainedModel = null!;
 
-            if (!File.Exists(Path.Combine(_workSpacePath, "model.zip")) || items.Count() == 0)
+            var modelPath = Path.Combine(_workSpacePath, "model.zip");
+            if (!File.Exists(modelPath) || !items.Any())
             {
                 await _mauiDialogService.DisplayAlert("Сообщение", "Сначала обучите модель и выберите изображения!", "OK");
-                return null!;
+                return Enumerable.Empty<ImageItemModel>();
             }
             if (_taskCommanderService.IsProcessing)
             {
                 await _mauiDialogService.DisplayAlert("Сообщение", "Классификация начнется после завершения фоновых задач", "OK");
             }
+
             _taskCommanderService.AddTask(() => Task.Run(() =>
             {
-                using var stream = new FileStream(Path.Combine(_workSpacePath, "model.zip"), FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var stream = new FileStream(modelPath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 trainedModel = mlContext.Model.Load(stream, out _);
             }), true);
             await PrepareImagesDataAsync(items);
 
-            var labeledItems = new List<ImageItemModel>();
-            var predictionEngine = mlContext.Model.CreatePredictionEngine<ImageData, ModelOutput>(trainedModel);
-            foreach (var data in _imagesData)
-            {
-                var prediction = predictionEngine.Predict(new ImageData { ImageBytes = data.ImageBytes });
-                var predictedLabel = prediction.PredictedLabel;
-                var probability = prediction.Score?.Max() ?? 0;
+            var labeledItems = await PredictBatchAsync(mlContext, trainedModel, items);
 
-                var item = items.FirstOrDefault(i => i.FullPath == data.FullPath);
-                {
-                    if (item != null && data.FullPath != null)
-                    {
-                        item.Labels.Add(new LabelModel(
-                            name: predictedLabel!,
-                            probability: probability,
-                            modelId: Guid.NewGuid(),
-                            lastModified: DateTime.Now));
-                        labeledItems.Add(item);
-                    }
-                }
-            }
             _imagesData.Clear();
             await _mauiDialogService.DisplayAlert("Сообщение", "Классификация изображений выполнена!", "OK");
             return labeledItems;
+        }
+
+        private async Task<IEnumerable<ImageItemModel>> PredictBatchAsync(MLContext mlContext, ITransformer model, IEnumerable<ImageItemModel> items)
+        {
+            return await Task.Run(() =>
+                {
+                    var predictionEngine = mlContext.Model.CreatePredictionEngine<ImageData, ModelOutput>(model);
+                    var results = new List<ImageItemModel>();
+
+                    foreach (var data in _imagesData)
+                    {
+                        var prediction = predictionEngine.Predict(new ImageData { ImageBytes = data.ImageBytes });
+                        var predictedLabel = prediction.PredictedLabel;
+                        var probability = prediction.Score?.Max() ?? 0;
+
+                        var item = items.FirstOrDefault(i => i.FullPath == data.FullPath);
+                        if (item != null && data.FullPath != null)
+                        {
+                            item.Labels.Add(new LabelModel(
+                                name: predictedLabel!,
+                                probability: probability,
+                                modelId: Guid.NewGuid(),
+                                lastModified: DateTime.Now));
+                            results.Add(item);
+                        }
+                    }
+                    return results;
+                });
         }
     }
 }
