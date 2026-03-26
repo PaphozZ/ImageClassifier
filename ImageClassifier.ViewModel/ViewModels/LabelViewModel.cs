@@ -1,11 +1,12 @@
-﻿using ImageClassifier.Core.Models;
-using Microsoft.Maui.Storage;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using ImageClassifier.Core.Models;
 
 namespace ImageClassifier.ViewModel.ViewModels
 {
-    public class LabelViewModel
+    public partial class LabelViewModel : ObservableObject
     {
-        public string Name { get; }
+        [ObservableProperty]
+        private string _name;
         public float Probability { get; }
         public Guid ModelId { get; }
         public DateTime LastModified { get; }

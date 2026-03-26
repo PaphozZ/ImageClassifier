@@ -16,7 +16,9 @@ public partial class ImageItemViewModel : ObservableObject
     public string FullPath { get; }
     public long Size { get; }
     public DateTime LastModified { get; }
-    public ObservableCollection<LabelViewModel> Labels { get; } = new();
+
+    [ObservableProperty]
+    private ObservableCollection<LabelViewModel> _labels = new();
 
     [ObservableProperty]
     private bool _isDeleted;

@@ -26,9 +26,13 @@ public class TaskCommanderService : ITaskCommanderService
 
     public async Task WaitForAllAsync(CancellationToken cancellationToken = default)
     {
-        using (cancellationToken.Register(() => _allTasksCompletion.TrySetCanceled(cancellationToken)))
+        if (_taskCount == 0)
+            return;
+
+        var tcs = _allTasksCompletion;
+        using (cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken)))
         {
-            await _allTasksCompletion.Task;
+            await tcs.Task;
         }
     }
 
@@ -44,7 +48,11 @@ public class TaskCommanderService : ITaskCommanderService
 
     public void AddTask(Func<Task> taskFactory, bool highPriority = false)
     {
-        _allTasksCompletion = new();
+        int newCount = Interlocked.Increment(ref _taskCount);
+        if (newCount == 1 && _allTasksCompletion.Task.IsCompleted)
+        {
+            _allTasksCompletion = new();
+        }
 
         if (highPriority)
             _highPriorityQueue.Enqueue(taskFactory);
@@ -88,7 +96,6 @@ public class TaskCommanderService : ITaskCommanderService
 
     private async Task RunTaskAsync(Func<Task> taskFactory, SemaphoreSlim semaphore)
     {
-        Interlocked.Increment(ref _taskCount);
         try
         {
             await taskFactory();
@@ -102,14 +109,8 @@ public class TaskCommanderService : ITaskCommanderService
             semaphore.Release();
             if (Interlocked.Decrement(ref _taskCount) == 0)
             {
-                if (_highPriorityQueue.IsEmpty && _lowPriorityQueue.IsEmpty)
-                {
-                    _allTasksCompletion.TrySetResult(true);
-                }
-                else
-                {
-                    _allTasksCompletion = new();
-                }
+                _allTasksCompletion.TrySetResult(true);
+                _allTasksCompletion = new();
             }
         }
     }

@@ -33,6 +33,9 @@ public partial class PreviewViewModel : ObservableObject
     private bool _isPreviewMode = true;
 
     [ObservableProperty]
+    private ImageItemViewModel? _selectedImageItem;
+
+    [ObservableProperty]
     private ObservableCollection<ImageItemViewModel> _positiveItems = new();
     [ObservableProperty]
     private ObservableCollection<ImageItemViewModel> _negativeItems = new();
@@ -98,6 +101,7 @@ public partial class PreviewViewModel : ObservableObject
     [RelayCommand]
     private void SelectFile(ImageItemViewModel file)
     {
+        SelectedImageItem = file;
         if (file.FilePreview != null)
             _taskCommanderService.AddTask(() => Fullscreen.ShowImageAsync(file), true);
     }
