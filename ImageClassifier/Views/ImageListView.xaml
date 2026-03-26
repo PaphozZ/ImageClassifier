@@ -25,7 +25,7 @@
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:ImageItemViewModel">
-                    <Grid Padding="10"
+                    <Grid Padding="5"
                           ColumnDefinitions="80, *"
                           RowDefinitions="Auto, Auto">
                         <Grid.GestureRecognizers>
@@ -35,12 +35,15 @@
                                                    DragStartingCommandParameter="{Binding .}" />
                         </Grid.GestureRecognizers>
 
-                        <Image Grid.RowSpan="2"
-                               Source="{Binding FilePreview}"
-                               Aspect="AspectFill"
-                               HeightRequest="70"
-                               WidthRequest="70"
-                               Margin="0,0,10,0" />
+                        <Border Grid.RowSpan="2"
+                                HeightRequest="70"
+                                WidthRequest="70"
+                                StrokeShape="RoundRectangle 5"
+                                Stroke="Transparent"
+                                Margin="0,0,10,0">
+                            <Image Source="{Binding FilePreview}"
+                                   Aspect="AspectFill" />
+                        </Border>
 
                         <Image Source="{Binding DatasetClass, Converter={StaticResource DatasetClassToIconConverter}}"
                                HorizontalOptions="End"

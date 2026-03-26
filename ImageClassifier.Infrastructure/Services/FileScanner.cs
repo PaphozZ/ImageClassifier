@@ -16,14 +16,13 @@ public class FileScanner : IFileScanner
 
             return dir.GetFiles()
                 .Where(f => IsImageFile(f.Extension))
-                .Select(f => new ImageItemModel
-                {
-                    FileName = f.Name,
-                    FilePath = f.DirectoryName ?? string.Empty,
-                    FullPath = f.FullName,
-                    LastModified = f.LastWriteTime,
-                    Size = f.Length
-                });
+                .Select(f => new ImageItemModel(
+                    fileName:f.Name, 
+                    filePath: f.DirectoryName!, 
+                    fullPath: f.FullName, 
+                    size: f.Length, 
+                    lastModified: DateTime.Now,
+                    labels: new()));
         });
     }
 

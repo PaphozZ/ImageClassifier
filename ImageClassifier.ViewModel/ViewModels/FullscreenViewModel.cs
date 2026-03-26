@@ -12,6 +12,7 @@ namespace ImageClassifier.ViewModel.ViewModels
 
         public async Task ShowImageAsync(ImageItemViewModel file)
         {
+            if (!file.IsDeleted)
             {
                 if (file.FullPath != null)
                 {
@@ -21,8 +22,8 @@ namespace ImageClassifier.ViewModel.ViewModels
                         SelectedImage = imageSource;
                     });
                 }
-            }
-            IsVisible = true;
+                IsVisible = true;
+            } 
         }
 
         public void Hide()

@@ -5,5 +5,6 @@ namespace ImageClassifier.Infrastructure.DTOs
     {
         public byte[]? ImageBytes { get; set; }
         public string? Label { get; set; }
+        public string? FullPath { get; set; }
     }
 }

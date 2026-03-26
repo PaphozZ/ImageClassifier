@@ -12,13 +12,13 @@ public class MediaPickerService : IMediaPickerService
             var image = await MediaPicker.Default.PickPhotoAsync();
             if (image == null) return null;
 
-            return new ImageItemModel
-            {
-                FileName = image.FileName,
-                FilePath = Path.GetDirectoryName(image.FullPath) ?? string.Empty,
-                FullPath = image.FullPath,
-                LastModified = DateTime.Now
-            };
+            return new ImageItemModel(
+                fileName: image.FileName,
+                filePath: Path.GetDirectoryName(image.FullPath)!,
+                fullPath: image.FullPath,
+                size: new FileInfo(image.FullPath).Length,
+                lastModified: DateTime.Now,
+                labels: new());
         }
         catch
         {

@@ -32,43 +32,57 @@ namespace ImageClassifier.Infrastructure.Services
                 {
                     var bytes = await _imageResizeService.ResizeTo224(item.FullPath);
                     if (bytes != null)
-                        _imagesData.Add(new ImageData { ImageBytes = bytes, Label = "Positive" });
+                        _imagesData.Add(new ImageData { ImageBytes = bytes, Label = "Positive", FullPath = item.FullPath });
                 });
             }
-
             await _taskCommanderService.WaitForAllAsync();
         }
 
-        public async Task ApplyPredictionsAsync(IEnumerable<ImageItemModel> items)
+        public async Task<IEnumerable<ImageItemModel>> ApplyPredictionsAsync(IEnumerable<ImageItemModel> items)
         {
             MLContext mlContext = new();
             ITransformer trainedModel = null!;
 
-            using (var stream = new FileStream(Path.Combine(_workSpacePath, "model.zip"), FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                trainedModel = mlContext.Model.Load(stream, out var modelSchema);
-            }
-            if (trainedModel == null || items.Count() == 0)
+            if (!File.Exists(Path.Combine(_workSpacePath, "model.zip")) || items.Count() == 0)
             {
                 await _mauiDialogService.DisplayAlert("Сообщение", "Сначала обучите модель и выберите изображения!", "OK");
-                return;
+                return null!;
             }
             if (_taskCommanderService.IsProcessing)
             {
                 await _mauiDialogService.DisplayAlert("Сообщение", "Классификация начнется после завершения фоновых задач", "OK");
             }
+            _taskCommanderService.AddTask(() => Task.Run(() =>
+            {
+                using var stream = new FileStream(Path.Combine(_workSpacePath, "model.zip"), FileMode.Open, FileAccess.Read, FileShare.Read);
+                trainedModel = mlContext.Model.Load(stream, out _);
+            }), true);
             await PrepareImagesDataAsync(items);
 
+            var labeledItems = new List<ImageItemModel>();
             var predictionEngine = mlContext.Model.CreatePredictionEngine<ImageData, ModelOutput>(trainedModel);
-
-            foreach (var item in _imagesData)
+            foreach (var data in _imagesData)
             {
-                var prediction = predictionEngine.Predict(new ImageData { ImageBytes = item.ImageBytes });
-                var resuslt = $"Результат: {prediction.PredictedLabel} (вероятность: {prediction.Score!.Max():P2})";
-            }
+                var prediction = predictionEngine.Predict(new ImageData { ImageBytes = data.ImageBytes });
+                var predictedLabel = prediction.PredictedLabel;
+                var probability = prediction.Score?.Max() ?? 0;
 
+                var item = items.FirstOrDefault(i => i.FullPath == data.FullPath);
+                {
+                    if (item != null && data.FullPath != null)
+                    {
+                        item.Labels.Add(new LabelModel(
+                            name: predictedLabel!,
+                            probability: probability,
+                            modelId: Guid.NewGuid(),
+                            lastModified: DateTime.Now));
+                        labeledItems.Add(item);
+                    }
+                }
+            }
             _imagesData.Clear();
             await _mauiDialogService.DisplayAlert("Сообщение", "Классификация изображений выполнена!", "OK");
+            return labeledItems;
         }
     }
 }

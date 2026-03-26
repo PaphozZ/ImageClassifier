@@ -49,6 +49,7 @@ public partial class PreviewViewModel : ObservableObject
     {
         FileCollection = fileCollection;
         Fullscreen = fullscreen;
+
         _folderPicker = folderPicker;
         _dialogService = dialogService;
         _mediaPickerService = mediaPickerService;
@@ -210,7 +211,8 @@ public partial class PreviewViewModel : ObservableObject
         if (IsTrainMode)
         {
             var positiveModels = PositiveItems.Select(f => f.ToModel());
-            await _predictionService.ApplyPredictionsAsync(positiveModels);
+            var labeledItems = await _predictionService.ApplyPredictionsAsync(positiveModels);
+            await FileCollection.FillLabelsAsync(labeledItems);
         }
     }
 }

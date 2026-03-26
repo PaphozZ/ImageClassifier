@@ -2,6 +2,7 @@
 using ImageClassifier.Core.Enums;
 using ImageClassifier.Core.Interfaces;
 using ImageClassifier.Core.Models;
+using System.Collections.ObjectModel;
 
 namespace ImageClassifier.ViewModel.ViewModels;
 
@@ -13,9 +14,9 @@ public partial class ImageItemViewModel : ObservableObject
     public string FileName { get; }
     public string FilePath { get; }
     public string FullPath { get; }
-
-    public DateTime LastModified { get; }
     public long Size { get; }
+    public DateTime LastModified { get; }
+    public ObservableCollection<LabelViewModel> Labels { get; } = new();
 
     [ObservableProperty]
     private bool _isDeleted;
@@ -34,8 +35,11 @@ public partial class ImageItemViewModel : ObservableObject
         FileName = model.FileName;
         FilePath = model.FilePath;
         FullPath = model.FullPath;
-        LastModified = model.LastModified;
         Size = model.Size;
+        LastModified = model.LastModified;
+
+        foreach (var label in model.Labels)
+            Labels.Add(new(label.Name, label.Probability, label.ModelId, label.LastModified));
 
         _taskCommanderService.AddTask(LoadThumbnailAsync);
     }
@@ -57,13 +61,12 @@ public partial class ImageItemViewModel : ObservableObject
 
     public ImageItemModel ToModel()
     {
-        return new ImageItemModel
-        {
-            FileName = FileName,
-            FilePath = FilePath,
-            FullPath = FullPath,
-            LastModified = LastModified,
-            Size = Size
-        };
+        return new ImageItemModel(
+            fileName: FileName,
+            filePath: FilePath,
+            fullPath: FullPath,
+            size: Size,
+            lastModified: LastModified,
+            labels: Labels.Select(l => l.ToModel()).ToList());
     }
 }

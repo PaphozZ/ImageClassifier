@@ -70,5 +70,25 @@ namespace ImageClassifier.ViewModel.ViewModels
             var models = files.Select(f => f.ToModel()).ToList();
             await _storageService.SaveFilesAsync(models);
         }
+
+        public async Task FillLabelsAsync(IEnumerable<ImageItemModel> items)
+        {
+            foreach (var item in items)
+            {
+                var file = Files.FirstOrDefault(f => f.FullPath == item.FullPath);
+                var labelData = item.Labels.LastOrDefault();
+                if (file != null && labelData != null)
+                {
+                    var label = new LabelViewModel(
+                        name: labelData.Name,
+                        probability: labelData.Probability,
+                        modelId: labelData.ModelId,
+                        lastModified: labelData.LastModified
+                    );
+                    file.Labels.Add(label);
+                }
+            }
+            await SaveAsync();
+        }
     }
 }
