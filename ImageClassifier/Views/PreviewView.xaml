@@ -18,7 +18,7 @@
               IsVisible="{Binding Fullscreen.IsVisible}"
               BackgroundColor="#80000000">
             <Grid.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding FullscreenTappedCommand}" />
+                <TapGestureRecognizer Command="{Binding Fullscreen.HideCommand}" />
             </Grid.GestureRecognizers>
             <Image Source="{Binding Fullscreen.SelectedImage}" />
 
@@ -44,7 +44,7 @@
                             Stroke="Transparent">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="10" />
+                                <RowDefinition Height="20" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0"

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace ImageClassifier.ViewModel.ViewModels
 {
@@ -26,6 +27,7 @@ namespace ImageClassifier.ViewModel.ViewModels
             } 
         }
 
+        [RelayCommand]
         public void Hide()
         {
             IsVisible = false;

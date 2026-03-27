@@ -16,6 +16,11 @@ namespace ImageClassifier.ViewModel.ViewModels
         [ObservableProperty]
         private ObservableCollection<ImageItemViewModel> _files = new();
 
+        [ObservableProperty]
+        private ObservableCollection<ImageItemViewModel> _positiveItems = new();
+        [ObservableProperty]
+        private ObservableCollection<ImageItemViewModel> _negativeItems = new();
+
         public FileCollectionViewModel(
             IFileStorageService storageService,
             IFileScanner fileScanner,
@@ -89,6 +94,12 @@ namespace ImageClassifier.ViewModel.ViewModels
                 }
             }
             await SaveAsync();
+        }
+
+        public void ClearZones()
+        {
+            PositiveItems.Clear();
+            NegativeItems.Clear();
         }
     }
 }

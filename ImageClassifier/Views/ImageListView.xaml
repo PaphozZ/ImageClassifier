@@ -31,7 +31,7 @@
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PreviewViewModel}}, Path=SelectFileCommand, x:DataType=vm:PreviewViewModel}"
                                                   CommandParameter="{Binding .}" />
-                            <DragGestureRecognizer DragStartingCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:PreviewViewModel}}, Path=DragStartingCommand, x:DataType=vm:PreviewViewModel}"
+                            <DragGestureRecognizer DragStartingCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:PreviewViewModel}}, Path=DragDropManager.DragStartingCommand, x:DataType=vm:PreviewViewModel}"
                                                    DragStartingCommandParameter="{Binding .}" />
                         </Grid.GestureRecognizers>
 

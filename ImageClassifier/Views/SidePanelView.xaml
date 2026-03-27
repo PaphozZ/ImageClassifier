@@ -16,7 +16,7 @@
 
             <Grid Grid.Row="0"
                   BackgroundColor="LightGray"
-                  IsVisible="{Binding IsPositiveVisible}">
+                  IsVisible="{Binding Workflow.IsPositiveVisible}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -30,12 +30,12 @@
                         StrokeThickness="2"
                         Stroke="Black">
                     <Border.GestureRecognizers>
-                        <DropGestureRecognizer DropCommand="{Binding DropToPositiveItemsCommand}" />
-                        <TapGestureRecognizer Command="{Binding RemoveLastPositiveItemCommand}" />
+                        <DropGestureRecognizer DropCommand="{Binding DragDropManager.DropToPositiveItemsCommand}" />
+                        <TapGestureRecognizer Command="{Binding DragDropManager.RemoveLastPositiveItemCommand}" />
                     </Border.GestureRecognizers>
                     <Label HorizontalTextAlignment="Center"
                            VerticalTextAlignment="Center"
-                           Text="{Binding PositiveItems.Count}"
+                           Text="{Binding FileCollection.PositiveItems.Count}"
                            FontSize="72" />
                 </Border>
             </Grid>
@@ -61,16 +61,16 @@
                         StrokeThickness="1"
                         Stroke="Gray" />
                 <Button Grid.Row="3"
-                        Text="{Binding TrainButtonText}"
-                        Command="{Binding TrainTappedCommand}" />
+                        Text="{Binding Workflow.TrainButtonText}"
+                        Command="{Binding Workflow.TrainTappedCommand}" />
                 <Button Grid.Row="4"
-                        Text="{Binding PredictButtonText}"
-                        Command="{Binding PredictTappedCommand}"/>
+                        Text="{Binding Workflow.PredictButtonText}"
+                        Command="{Binding Workflow.PredictTappedCommand}"/>
             </Grid>
 
             <Grid Grid.Row="4"
                   BackgroundColor="LightGray"
-                  IsVisible="{Binding IsNegativeVisible}">
+                  IsVisible="{Binding Workflow.IsNegativeVisible}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -85,19 +85,19 @@
                         StrokeThickness="2"
                         Stroke="Black">
                     <Border.GestureRecognizers>
-                        <DropGestureRecognizer DropCommand="{Binding DropToNegativeItemsCommand}" />
-                        <TapGestureRecognizer Command="{Binding RemoveLastNegativeItemCommand}" />
+                        <DropGestureRecognizer DropCommand="{Binding DragDropManager.DropToNegativeItemsCommand}" />
+                        <TapGestureRecognizer Command="{Binding DragDropManager.RemoveLastNegativeItemCommand}" />
                     </Border.GestureRecognizers>
                     <Grid>
                         <Label HorizontalTextAlignment="Center"
                                VerticalTextAlignment="Center"
-                               Text="{Binding NegativeItems.Count}"
+                               Text="{Binding FileCollection.NegativeItems.Count}"
                                FontSize="72"
-                               IsVisible="{Binding IsNegativeVisible}" />
+                               IsVisible="{Binding Workflow.IsNegativeVisible}" />
                         <Image Grid.Row="1"
                                Source="waste_basket.png"
                                Aspect="AspectFill"
-                               IsVisible="{Binding IsPreviewMode}">
+                               IsVisible="{Binding Workflow.IsPreviewMode}">
                         </Image>
                     </Grid>
                 </Border>

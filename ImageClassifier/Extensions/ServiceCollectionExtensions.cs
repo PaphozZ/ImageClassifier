@@ -13,8 +13,10 @@ namespace ImageClassifier.Extensions
             services.AddTransient<MainViewModel>();
             services.AddTransient<SampleViewModel>();
             services.AddTransient<PreviewViewModel>();
-            services.AddTransient<FileCollectionViewModel>();
+            services.AddSingleton<FileCollectionViewModel>();
             services.AddTransient<FullscreenViewModel>();
+            services.AddSingleton<WorkflowViewModel>();
+            services.AddTransient<DragDropManagerViewModel>();
             return services;
         }
 
