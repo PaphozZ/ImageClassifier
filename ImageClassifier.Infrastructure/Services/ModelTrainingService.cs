@@ -3,7 +3,6 @@ using ImageClassifier.Core.Models;
 using ImageClassifier.Infrastructure.DTOs;
 using Microsoft.ML;
 using Microsoft.ML.Vision;
-using SkiaSharp;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 

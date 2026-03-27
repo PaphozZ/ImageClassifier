@@ -11,12 +11,12 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="200" />
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0"
                   BackgroundColor="LightGray"
-                  IsVisible="{Binding IsTrainMode}">
+                  IsVisible="{Binding IsPositiveVisible}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -62,14 +62,15 @@
                         Stroke="Gray" />
                 <Button Grid.Row="3"
                         Text="{Binding TrainButtonText}"
-                        Command="{Binding TrainModeCommand}" />
+                        Command="{Binding TrainTappedCommand}" />
                 <Button Grid.Row="4"
                         Text="{Binding PredictButtonText}"
-                        Command="{Binding TrainCommand}"/>
+                        Command="{Binding PredictTappedCommand}"/>
             </Grid>
 
             <Grid Grid.Row="4"
-                  BackgroundColor="LightGray">
+                  BackgroundColor="LightGray"
+                  IsVisible="{Binding IsNegativeVisible}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -92,7 +93,7 @@
                                VerticalTextAlignment="Center"
                                Text="{Binding NegativeItems.Count}"
                                FontSize="72"
-                               IsVisible="{Binding IsTrainMode}" />
+                               IsVisible="{Binding IsNegativeVisible}" />
                         <Image Grid.Row="1"
                                Source="waste_basket.png"
                                Aspect="AspectFill"

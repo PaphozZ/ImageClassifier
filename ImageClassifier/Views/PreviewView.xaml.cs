@@ -4,6 +4,7 @@ public partial class PreviewView : ContentView
 {
     private double _startX, _startY;
     private double _startTranslationX, _startTranslationY;
+
     public PreviewView()
 	{
 		InitializeComponent();

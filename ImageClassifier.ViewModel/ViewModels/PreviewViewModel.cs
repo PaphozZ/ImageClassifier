@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ImageClassifier.Core.Enums;
 using ImageClassifier.Core.Interfaces;
+using ImageClassifier.Core.Models;
+using ImageClassifier.ViewModel.Enums;
 using System.Collections.ObjectModel;
 using System.Runtime.Versioning;
 
@@ -25,12 +27,20 @@ public partial class PreviewViewModel : ObservableObject
     [ObservableProperty]
     private string? _trainButtonText = "Обучение";
     [ObservableProperty]
-    private string? _predictButtonText = "";
+    private string? _predictButtonText = "Классификация";
+
+    private bool _isTrainMode;
+    private bool _isPredictMode;
+
+    private AppMode _currentMode = AppMode.Preview;
 
     [ObservableProperty]
-    private bool _isTrainMode;
-    [ObservableProperty]
     private bool _isPreviewMode = true;
+
+    [ObservableProperty]
+    private bool _isPositiveVisible;
+    [ObservableProperty]
+    private bool _isNegativeVisible = true;
 
     [ObservableProperty]
     private ImageItemViewModel? _selectedImageItem;
@@ -110,10 +120,8 @@ public partial class PreviewViewModel : ObservableObject
     private void FullscreenTapped() => Fullscreen.Hide();
 
     [RelayCommand]
-    private void DragStarting(ImageItemViewModel item)
-    {
-        _draggedItem = item;
-    }
+    private void DragStarting(ImageItemViewModel item) => _draggedItem = item;
+
 
     [RelayCommand]
     private void DropToPositiveItems()
@@ -125,6 +133,11 @@ public partial class PreviewViewModel : ObservableObject
                 NegativeItems.Remove(_draggedItem);
             _draggedItem.DatasetClass = DatasetClass.Positive;
             _draggedItem = null;
+
+            if (_isPredictMode)
+            {
+                IsNegativeVisible = false;
+            }
         }
     }
 
@@ -143,29 +156,66 @@ public partial class PreviewViewModel : ObservableObject
                 if (PositiveItems.Contains(_draggedItem))
                     PositiveItems.Remove(_draggedItem);
                 _draggedItem.DatasetClass = DatasetClass.Negative;
+
+                if (_isPredictMode)
+                {
+                    IsPositiveVisible = false;
+                }
             }
             _draggedItem = null;
         }
     }
 
     [RelayCommand]
-    private void TrainMode(ImageItemViewModel file)
+    private async Task TrainTapped(ImageItemViewModel file)
     {
-        IsTrainMode = !IsTrainMode;
-        IsPreviewMode = !IsPreviewMode;
-
-        if (IsTrainMode)
+        switch (_currentMode)
         {
-            TrainButtonText = "Назад";
-            PredictButtonText = "Обучить!";
+            case AppMode.Preview:
+                SelectMode(AppMode.Train);
+                break;
+            case AppMode.Train:
+                SelectMode(AppMode.Preview);
+                break;
+            case AppMode.Predict:
+                await Predict();
+                break;
         }
-        else
+    }
+
+    [RelayCommand]
+    private async Task PredictTapped(ImageItemViewModel file)
+    {
+        switch (_currentMode)
+        {
+            case AppMode.Preview:
+                SelectMode(AppMode.Predict);
+                break;
+            case AppMode.Predict:
+                SelectMode(AppMode.Preview);
+                break;
+            case AppMode.Train:
+                await Train();
+                break;
+        }
+    }
+
+    private void SelectMode(AppMode mode)
+    {
+        (_isTrainMode, _isPredictMode, IsPreviewMode, IsPositiveVisible, IsNegativeVisible,
+         TrainButtonText, PredictButtonText, _currentMode) = mode switch
+         {
+             AppMode.Preview => (false, false, true, false, true, "Обучение", "Классификация", AppMode.Preview),
+             AppMode.Train => (true, false, false, true, true, "Назад", "Обучить!", AppMode.Train),
+             AppMode.Predict => (false, true, false, true, true, "Классифицировать!", "Назад", AppMode.Predict),
+             _ => default
+         };
+
+        if (mode == AppMode.Preview)
         {
             PositiveItems.Clear();
             NegativeItems.Clear();
             _taskCommanderService.AddTask(FileCollection.ResetDatasetClasses, true);
-            TrainButtonText = "Обучение";
-            PredictButtonText = "";
         }
     }
 
@@ -177,6 +227,11 @@ public partial class PreviewViewModel : ObservableObject
         {
             lastItem.DatasetClass = DatasetClass.None;
             PositiveItems.Remove(lastItem);
+
+            if (_isPredictMode && PositiveItems.Count == 0)
+            {
+                IsNegativeVisible = true;
+            }
         }
     }
 
@@ -188,13 +243,17 @@ public partial class PreviewViewModel : ObservableObject
         {
             lastItem.DatasetClass = DatasetClass.None;
             NegativeItems.Remove(lastItem);
+
+            if (_isPredictMode && NegativeItems.Count == 0)
+            {
+                IsPositiveVisible = true;
+            }
         }
     }
 
-    [RelayCommand]
     private async Task Train()
     {
-        if (IsTrainMode)
+        if (_isTrainMode)
         {
             if (PositiveItems.Count > 0 && NegativeItems.Count > 0)
             {
@@ -209,14 +268,26 @@ public partial class PreviewViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
     private async Task Predict()
     {
-        if (IsTrainMode)
+        if (_isPredictMode)
         {
-            var positiveModels = PositiveItems.Select(f => f.ToModel());
-            var labeledItems = await _predictionService.ApplyPredictionsAsync(positiveModels);
-            await FileCollection.FillLabelsAsync(labeledItems);
+            List<ImageItemModel> classificationModels = new();
+            if (PositiveItems.Count == 0)
+            {
+                classificationModels = FileCollection.Files
+                    .Where(f => !NegativeItems.Any(n => n.FullPath == f.FullPath) && !f.IsDeleted)
+                    .Select(f => f.ToModel())
+                    .ToList();
+            }
+            else if (NegativeItems.Count == 0)
+            {
+                classificationModels = PositiveItems
+                    .Select(f => f.ToModel())
+                    .ToList();
+            }
+            var labeledModels = await _predictionService.ApplyPredictionsAsync(classificationModels);
+            await FileCollection.FillLabelsAsync(labeledModels);
         }
     }
 }
