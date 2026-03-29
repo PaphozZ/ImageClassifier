@@ -82,7 +82,7 @@ namespace ImageClassifier.Infrastructure.Services
                         var probability = prediction.Score?.Max() ?? 0;
 
                         var item = items.FirstOrDefault(i => i.FullPath == data.FullPath);
-                        if (item != null && data.FullPath != null)
+                        if (item != null && data.FullPath != null && predictedLabel != "Negative")
                         {
                             item.Labels.Add(new LabelModel(
                                 name: predictedLabel!,

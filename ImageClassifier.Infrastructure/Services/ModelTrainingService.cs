@@ -17,14 +17,17 @@ public class ModelTrainingService : IModelTrainingService
     private readonly ConcurrentBag<ImageData> _imagesData = new();
     private readonly string _workSpacePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "model_workspace");
 
-    public ModelTrainingService(ITaskCommanderService taskCommanderService, IDialogService mauiDialogService, IImageResizeService imageResizeService)
+    public ModelTrainingService(
+        ITaskCommanderService taskCommanderService, 
+        IDialogService mauiDialogService, 
+        IImageResizeService imageResizeService)
     {
         _taskCommanderService = taskCommanderService;
         _mauiDialogService = mauiDialogService;
         _imageResizeService = imageResizeService;
     }
 
-    private async Task PrepareImagesDataAsync(IEnumerable<ImageItemModel> positiveItems, IEnumerable<ImageItemModel> negativeItems)
+    private async Task PrepareImagesDataAsync(IEnumerable<ImageItemModel> positiveItems, IEnumerable<ImageItemModel> negativeItems, string label)
     {
         foreach (var item in positiveItems)
         {
@@ -32,7 +35,7 @@ public class ModelTrainingService : IModelTrainingService
             {
                 var bytes = await _imageResizeService.ResizeTo224(item.FullPath);
                 if (bytes != null)
-                    _imagesData.Add(new ImageData { ImageBytes = bytes, Label = "Positive" });
+                    _imagesData.Add(new ImageData { ImageBytes = bytes, Label = label });
             });
         }
         foreach (var item in negativeItems)
@@ -48,7 +51,7 @@ public class ModelTrainingService : IModelTrainingService
         await _taskCommanderService.WaitForAllAsync();
     }
 
-    public async Task TrainAsync(IEnumerable<ImageItemModel> positiveItems, IEnumerable<ImageItemModel> negativeItems)
+    public async Task TrainAsync(IEnumerable<ImageItemModel> positiveItems, IEnumerable<ImageItemModel> negativeItems, string label)
     {
         MLContext mlContext = new();
         ITransformer trainedModel = null!;
@@ -57,7 +60,7 @@ public class ModelTrainingService : IModelTrainingService
         {
             await _mauiDialogService.DisplayAlert("Сообщение", "Обучение начнется после завершения фоновых задач", "OK");
         }
-        await PrepareImagesDataAsync(positiveItems, negativeItems);
+        await PrepareImagesDataAsync(positiveItems, negativeItems, label);
 
         var options = new ImageClassificationTrainer.Options()
         {

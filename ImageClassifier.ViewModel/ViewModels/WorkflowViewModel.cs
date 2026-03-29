@@ -23,13 +23,13 @@ public partial class WorkflowViewModel : ObservableObject
         _dialogService = dialogService;
     }
 
-    public async Task Train()
+    public async Task Train(string label)
     {
         if (_fileCollection.PositiveItems.Count > 0 && _fileCollection.NegativeItems.Count > 0)
         {
             var positiveModels = _fileCollection.PositiveItems.Select(f => f.ToModel());
             var negativeModels = _fileCollection.NegativeItems.Select(f => f.ToModel());
-            await _modelTrainingService.TrainAsync(positiveModels, negativeModels);
+            await _modelTrainingService.TrainAsync(positiveModels, negativeModels, label);
         }
         else
         {

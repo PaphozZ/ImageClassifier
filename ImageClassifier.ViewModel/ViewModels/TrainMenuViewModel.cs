@@ -7,8 +7,13 @@ namespace ImageClassifier.ViewModel.ViewModels
     public partial class TrainMenuViewModel : ObservableObject
     {
         private readonly ModeManagerViewModel _modeManagerViewModel;
+
         [ObservableProperty]
         private bool _trainMenuIsVisible;
+        [ObservableProperty]
+        private bool _acceptButtonIsEnabled;
+
+        private string _newLabel = string.Empty;
 
         public TrainMenuViewModel(
             ModeManagerViewModel modeManagerViewModel)
@@ -16,7 +21,20 @@ namespace ImageClassifier.ViewModel.ViewModels
             _modeManagerViewModel = modeManagerViewModel;
         }
 
-        [RelayCommand]
+        public string NewLabel
+        {
+            get => _newLabel;
+            set
+            {
+                if (_newLabel != value)
+                {
+                    _newLabel = value;
+                    AcceptButtonIsEnabled = !string.IsNullOrEmpty(_newLabel);
+                    OnPropertyChanged(nameof(NewLabel));
+                }
+            }
+        }
+
         public void Show()
         {
             TrainMenuIsVisible = true;

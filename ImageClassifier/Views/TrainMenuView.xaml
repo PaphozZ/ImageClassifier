@@ -10,12 +10,30 @@
                 WidthRequest="600"
                 HeightRequest="400">
             <Grid BackgroundColor="White">
+                <StackLayout HorizontalOptions="Center"
+                             VerticalOptions="Center">
+                    <Border StrokeShape="RoundRectangle 10"
+                            Stroke="Black"
+                            StrokeThickness="1">
+                        <Grid>
+                            <Entry Placeholder="Введите название метки"
+                                   FontSize="16"
+                                   MaxLength="30"
+                                   WidthRequest="240"
+                                   HeightRequest="20"
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="Center"
+                                   Text="{Binding TrainMenu.NewLabel}"/>
+                        </Grid>
+                    </Border>
+                </StackLayout>
                 <HorizontalStackLayout HorizontalOptions="Center"
                                        VerticalOptions="End"
                                        Spacing="20"
                                        Margin="0,0,0,20">
                     <Button Text="Ок"
                             Command="{Binding TrainMenu.AcceptCommand}"
+                            IsEnabled="{Binding TrainMenu.AcceptButtonIsEnabled}"
                             HorizontalOptions="Start"
                             VerticalOptions="Center" />
                     <Button Text="Отмена"

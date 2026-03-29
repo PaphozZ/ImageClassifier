@@ -19,7 +19,6 @@ public partial class PreviewViewModel : ObservableObject
     private readonly IFolderPicker _folderPicker;
     private readonly IDialogService _dialogService;
     private readonly IMediaPickerService _mediaPickerService;
-    private readonly ITaskCommanderService _taskCommanderService;
 
     public PreviewViewModel(
         FileCollectionViewModel fileCollection,
@@ -30,8 +29,7 @@ public partial class PreviewViewModel : ObservableObject
         ModeManagerViewModel modeManager,
         IFolderPicker folderPicker,
         IDialogService dialogService,
-        IMediaPickerService mediaPickerService,
-        ITaskCommanderService taskCommander)
+        IMediaPickerService mediaPickerService)
     {
         FileCollection = fileCollection;
         Fullscreen = fullscreen;
@@ -43,7 +41,6 @@ public partial class PreviewViewModel : ObservableObject
         _folderPicker = folderPicker;
         _dialogService = dialogService;
         _mediaPickerService = mediaPickerService;
-        _taskCommanderService = taskCommander;
     }
 
 
@@ -114,7 +111,7 @@ public partial class PreviewViewModel : ObservableObject
                 break;
             case AppMode.Train:
                 ModeManager.SelectMode(AppMode.Processing);
-                await Workflow.Train();
+                await Workflow.Train(TrainMenu.NewLabel);
                 ModeManager.SelectMode(AppMode.Train);
                 break;
         }
