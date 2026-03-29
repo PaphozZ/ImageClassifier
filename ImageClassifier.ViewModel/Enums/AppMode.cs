@@ -4,6 +4,7 @@
     {
         Preview,
         Train,
-        Predict
+        Predict,
+        Processing
     }
 }

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ImageClassifier.Core.Interfaces;
+using ImageClassifier.ViewModel.Enums;
 using System.Runtime.Versioning;
 
 namespace ImageClassifier.ViewModel.ViewModels;
@@ -10,22 +11,23 @@ public partial class PreviewViewModel : ObservableObject
 {
     public FileCollectionViewModel FileCollection { get; }
     public FullscreenViewModel Fullscreen { get; }
-    public WorkflowViewModel Workflow { get; }
     public DragDropManagerViewModel DragDropManager { get; }
+    public WorkflowViewModel Workflow { get; }
+    public TrainMenuViewModel TrainMenu { get; }
+    public ModeManagerViewModel ModeManager { get; }
 
     private readonly IFolderPicker _folderPicker;
     private readonly IDialogService _dialogService;
     private readonly IMediaPickerService _mediaPickerService;
     private readonly ITaskCommanderService _taskCommanderService;
 
-    [ObservableProperty]
-    private ImageItemViewModel? _selectedImageItem;
-
     public PreviewViewModel(
         FileCollectionViewModel fileCollection,
         FullscreenViewModel fullscreen,
-        WorkflowViewModel modeManager,
         DragDropManagerViewModel dragDropManager,
+        WorkflowViewModel workflow,
+        TrainMenuViewModel trainMenu,
+        ModeManagerViewModel modeManager,
         IFolderPicker folderPicker,
         IDialogService dialogService,
         IMediaPickerService mediaPickerService,
@@ -33,15 +35,15 @@ public partial class PreviewViewModel : ObservableObject
     {
         FileCollection = fileCollection;
         Fullscreen = fullscreen;
-        Workflow = modeManager;
         DragDropManager = dragDropManager;
+        Workflow = workflow;
+        TrainMenu = trainMenu;
+        ModeManager = modeManager;
 
         _folderPicker = folderPicker;
         _dialogService = dialogService;
         _mediaPickerService = mediaPickerService;
         _taskCommanderService = taskCommander;
-
-        _taskCommanderService.AddTask(FileCollection.LoadSavedFilesAsync);
     }
 
 
@@ -81,10 +83,40 @@ public partial class PreviewViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void SelectFile(ImageItemViewModel file)
+    private async Task TrainTapped()
     {
-        SelectedImageItem = file;
-        if (file.FilePreview != null)
-            _taskCommanderService.AddTask(() => Fullscreen.ShowImageAsync(file), true);
+        switch (ModeManager.CurrentMode)
+        {
+            case AppMode.Preview:
+                TrainMenu.Show();
+                break;
+            case AppMode.Train:
+                ModeManager.SelectMode(AppMode.Preview);
+                break;
+            case AppMode.Predict:
+                ModeManager.SelectMode(AppMode.Processing);
+                await Workflow.Predict();
+                ModeManager.SelectMode(AppMode.Predict);
+                break;
+        }
+    }
+
+    [RelayCommand]
+    private async Task PredictTapped()
+    {
+        switch (ModeManager.CurrentMode)
+        {
+            case AppMode.Preview:
+                ModeManager.SelectMode(AppMode.Predict);
+                break;
+            case AppMode.Predict:
+                ModeManager.SelectMode(AppMode.Preview);
+                break;
+            case AppMode.Train:
+                ModeManager.SelectMode(AppMode.Processing);
+                await Workflow.Train();
+                ModeManager.SelectMode(AppMode.Train);
+                break;
+        }
     }
 }

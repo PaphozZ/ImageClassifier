@@ -16,7 +16,7 @@
 
             <Grid Grid.Row="0"
                   BackgroundColor="LightGray"
-                  IsVisible="{Binding Workflow.IsPositiveVisible}">
+                  IsVisible="{Binding ModeManager.IsPositiveVisible}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -61,16 +61,18 @@
                         StrokeThickness="1"
                         Stroke="Gray" />
                 <Button Grid.Row="3"
-                        Text="{Binding Workflow.TrainButtonText}"
-                        Command="{Binding Workflow.TrainTappedCommand}" />
+                        Text="{Binding ModeManager.TrainButtonText}"
+                        Command="{Binding TrainTappedCommand}"
+                        IsEnabled="{Binding ModeManager.TrainButtonIsEnabled}"/>
                 <Button Grid.Row="4"
-                        Text="{Binding Workflow.PredictButtonText}"
-                        Command="{Binding Workflow.PredictTappedCommand}"/>
+                        Text="{Binding ModeManager.PredictButtonText}"
+                        Command="{Binding PredictTappedCommand}"
+                        IsEnabled="{Binding ModeManager.PredictButtonIsEnabled}" />
             </Grid>
 
             <Grid Grid.Row="4"
                   BackgroundColor="LightGray"
-                  IsVisible="{Binding Workflow.IsNegativeVisible}">
+                  IsVisible="{Binding ModeManager.IsNegativeVisible}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -93,11 +95,11 @@
                                VerticalTextAlignment="Center"
                                Text="{Binding FileCollection.NegativeItems.Count}"
                                FontSize="72"
-                               IsVisible="{Binding Workflow.IsNegativeVisible}" />
+                               IsVisible="{Binding ModeManager.IsNegativeVisible}" />
                         <Image Grid.Row="1"
                                Source="waste_basket.png"
                                Aspect="AspectFill"
-                               IsVisible="{Binding Workflow.IsPreviewMode}">
+                               IsVisible="{Binding ModeManager.IsPreviewMode}">
                         </Image>
                     </Grid>
                 </Border>

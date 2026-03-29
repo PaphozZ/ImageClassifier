@@ -29,7 +29,7 @@
                           ColumnDefinitions="80, *"
                           RowDefinitions="Auto, Auto">
                         <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PreviewViewModel}}, Path=SelectFileCommand, x:DataType=vm:PreviewViewModel}"
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PreviewViewModel}}, Path=Fullscreen.SelectFileCommand, x:DataType=vm:PreviewViewModel}"
                                                   CommandParameter="{Binding .}" />
                             <DragGestureRecognizer DragStartingCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:PreviewViewModel}}, Path=DragDropManager.DragStartingCommand, x:DataType=vm:PreviewViewModel}"
                                                    DragStartingCommandParameter="{Binding .}" />

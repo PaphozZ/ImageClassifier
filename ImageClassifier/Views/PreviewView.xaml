@@ -14,62 +14,7 @@
         <local:ImageListView Grid.Column="0" />
         <local:SidePanelView Grid.Column="1" />
 
-        <Grid Grid.ColumnSpan="2"
-              IsVisible="{Binding Fullscreen.IsVisible}"
-              BackgroundColor="#80000000">
-            <Grid.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding Fullscreen.HideCommand}" />
-            </Grid.GestureRecognizers>
-            <Image Source="{Binding Fullscreen.SelectedImage}" />
-
-            <StackLayout HorizontalOptions="Center"
-                         VerticalOptions="Center">
-                <Grid x:Name="LabelsPanel"
-                      Background="Transparent">
-                    <Grid.Resources>
-                        <Style TargetType="Button">
-                            <Setter Property="Background"
-                                    Value="LightGreen" />
-                            <Setter Property="FontSize"
-                                    Value="16" />
-                            <Setter Property="HeightRequest"
-                                    Value="40" />
-                        </Style>
-                    </Grid.Resources>
-                    <Grid.GestureRecognizers>
-                        <PanGestureRecognizer PanUpdated="OnPanUpdated" />
-                    </Grid.GestureRecognizers>
-                    <Border StrokeShape="RoundRectangle 10"
-                            BackgroundColor="#CCFFFFFF"
-                            Stroke="Transparent">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="20" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0"
-                                  BackgroundColor="White" />
-                            <CollectionView Grid.Row="1"
-                                            ItemsSource="{Binding SelectedImageItem.Labels}"
-                                            HorizontalOptions="Center"
-                                            VerticalOptions="Center"
-                                            Margin="10">
-                                <CollectionView.ItemsLayout>
-                                    <LinearItemsLayout Orientation="Horizontal"
-                                                       ItemSpacing="5" />
-                                </CollectionView.ItemsLayout>
-                                <CollectionView.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:LabelViewModel">
-                                        <Button Text="{Binding Name}"
-                                                HorizontalOptions="Start"
-                                                VerticalOptions="Center" />
-                                    </DataTemplate>
-                                </CollectionView.ItemTemplate>
-                            </CollectionView>
-                        </Grid>
-                    </Border>
-                </Grid>
-            </StackLayout>
-        </Grid>
+        <local:FullscreenView Grid.ColumnSpan="2" />
+        <local:TrainMenuView Grid.ColumnSpan="2" />
     </Grid>
 </ContentView>

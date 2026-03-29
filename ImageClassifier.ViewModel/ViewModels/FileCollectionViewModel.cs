@@ -31,9 +31,11 @@ namespace ImageClassifier.ViewModel.ViewModels
             _fileScanner = fileScanner;
             _imageResizeService = imageResizeService;
             _taskCommanderService = taskCommanderService;
+
+            _taskCommanderService.AddTask(LoadSavedFilesAsync);
         }
 
-        public async Task LoadSavedFilesAsync()
+        private async Task LoadSavedFilesAsync()
         {
             var models = await _storageService.LoadFilesAsync();
             Files.Clear();

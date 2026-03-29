@@ -17,6 +17,8 @@ namespace ImageClassifier.Extensions
             services.AddTransient<FullscreenViewModel>();
             services.AddSingleton<WorkflowViewModel>();
             services.AddTransient<DragDropManagerViewModel>();
+            services.AddTransient<TrainMenuViewModel>();
+            services.AddSingleton<ModeManagerViewModel>();
             return services;
         }
 

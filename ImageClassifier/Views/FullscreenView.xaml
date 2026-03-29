@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ImageClassifier.ViewModel.ViewModels;assembly=ImageClassifier.ViewModel"
+             x:Class="ImageClassifier.Views.FullscreenView"
+             x:DataType="vm:PreviewViewModel">
+    <Grid IsVisible="{Binding Fullscreen.IsVisible}"
+          BackgroundColor="#80000000">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding Fullscreen.HideCommand}" />
+        </Grid.GestureRecognizers>
+        <Image Source="{Binding Fullscreen.SelectedImage}" />
+
+        <StackLayout HorizontalOptions="Center"
+                     VerticalOptions="Center">
+            <Grid x:Name="LabelsPanel"
+                  Background="Transparent">
+                <Grid.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Background"
+                                Value="LightGreen" />
+                        <Setter Property="FontSize"
+                                Value="16" />
+                        <Setter Property="HeightRequest"
+                                Value="40" />
+                    </Style>
+                </Grid.Resources>
+                <Grid.GestureRecognizers>
+                    <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+                </Grid.GestureRecognizers>
+                <Border StrokeShape="RoundRectangle 10"
+                        BackgroundColor="#CCFFFFFF"
+                        Stroke="Transparent">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0"
+                              BackgroundColor="White" />
+                        <CollectionView Grid.Row="1"
+                                        ItemsSource="{Binding Fullscreen.SelectedImageItem.Labels}"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center"
+                                        Margin="10">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Horizontal"
+                                                   ItemSpacing="5" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:LabelViewModel">
+                                    <Button Text="{Binding Name}"
+                                            HorizontalOptions="Start"
+                                            VerticalOptions="Center" />
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Grid>
+                </Border>
+            </Grid>
+        </StackLayout>
+    </Grid>
+</ContentView>

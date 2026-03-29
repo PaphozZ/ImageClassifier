@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ImageClassifier.ViewModel.ViewModels;assembly=ImageClassifier.ViewModel"
+             x:Class="ImageClassifier.Views.TrainMenuView"
+             x:DataType="vm:PreviewViewModel">
+    <Grid IsVisible="{Binding TrainMenu.TrainMenuIsVisible}"
+          BackgroundColor="#80000000">
+        <Border StrokeShape="RoundRectangle 10"
+                WidthRequest="600"
+                HeightRequest="400">
+            <Grid BackgroundColor="White">
+                <HorizontalStackLayout HorizontalOptions="Center"
+                                       VerticalOptions="End"
+                                       Spacing="20"
+                                       Margin="0,0,0,20">
+                    <Button Text="Ок"
+                            Command="{Binding TrainMenu.AcceptCommand}"
+                            HorizontalOptions="Start"
+                            VerticalOptions="Center" />
+                    <Button Text="Отмена"
+                            Command="{Binding TrainMenu.CancelCommand}"
+                            HorizontalOptions="Start"
+                            VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentView>

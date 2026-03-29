@@ -7,16 +7,16 @@ using ImageClassifier.ViewModel.ViewModels;
 public partial class DragDropManagerViewModel : ObservableObject
 {
     private readonly FileCollectionViewModel _fileCollection;
-    private readonly WorkflowViewModel _workflowManager;
+    private readonly ModeManagerViewModel _modeManager;
 
     private ImageItemViewModel? _draggedItem;
 
     public DragDropManagerViewModel(
-        FileCollectionViewModel fileCollection, 
-        WorkflowViewModel workflowManager)
+        FileCollectionViewModel fileCollection,
+        ModeManagerViewModel modeManager)
     {
         _fileCollection = fileCollection;
-        _workflowManager = workflowManager;
+        _modeManager = modeManager;
     }
 
     [RelayCommand]
@@ -33,9 +33,9 @@ public partial class DragDropManagerViewModel : ObservableObject
             _draggedItem.DatasetClass = DatasetClass.Positive;
             _draggedItem = null;
 
-            if (_workflowManager.CurrentMode == AppMode.Predict)
+            if (_modeManager.CurrentMode == AppMode.Predict)
             {
-                _workflowManager.IsNegativeVisible = false;
+                _modeManager.IsNegativeVisible = false;
             }
         }
     }
@@ -45,7 +45,7 @@ public partial class DragDropManagerViewModel : ObservableObject
     {
         if (_draggedItem != null && !_draggedItem.IsDeleted && !_fileCollection.NegativeItems.Contains(_draggedItem))
         {
-            if (_workflowManager.CurrentMode == AppMode.Preview)
+            if (_modeManager.CurrentMode == AppMode.Preview)
             {
                 await _fileCollection.RemoveFileAsync(_draggedItem);
             }
@@ -56,9 +56,9 @@ public partial class DragDropManagerViewModel : ObservableObject
                     _fileCollection.PositiveItems.Remove(_draggedItem);
                 _draggedItem.DatasetClass = DatasetClass.Negative;
 
-                if (_workflowManager.CurrentMode == AppMode.Predict)
+                if (_modeManager.CurrentMode == AppMode.Predict)
                 {
-                    _workflowManager.IsPositiveVisible = false;
+                    _modeManager.IsPositiveVisible = false;
                 }
             }
             _draggedItem = null;
@@ -74,9 +74,9 @@ public partial class DragDropManagerViewModel : ObservableObject
             lastItem.DatasetClass = DatasetClass.None;
             _fileCollection.PositiveItems.Remove(lastItem);
 
-            if (_workflowManager.CurrentMode == AppMode.Predict && _fileCollection.PositiveItems.Count == 0)
+            if (_modeManager.CurrentMode == AppMode.Predict && _fileCollection.PositiveItems.Count == 0)
             {
-                _workflowManager.IsNegativeVisible = true;
+                _modeManager.IsNegativeVisible = true;
             }
         }
     }
@@ -90,9 +90,9 @@ public partial class DragDropManagerViewModel : ObservableObject
             lastItem.DatasetClass = DatasetClass.None;
             _fileCollection.NegativeItems.Remove(lastItem);
 
-            if (_workflowManager.CurrentMode == AppMode.Predict && _fileCollection.NegativeItems.Count == 0)
+            if (_modeManager.CurrentMode == AppMode.Predict && _fileCollection.NegativeItems.Count == 0)
             {
-                _workflowManager.IsPositiveVisible = true;
+                _modeManager.IsPositiveVisible = true;
             }
         }
     }
