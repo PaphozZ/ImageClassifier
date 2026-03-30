@@ -9,19 +9,32 @@ public class MediaPickerService : IMediaPickerService
     {
         try
         {
-            var image = await MediaPicker.Default.PickPhotoAsync();
+            var customFileType = new FilePickerFileType(
+                new Dictionary<DevicePlatform, IEnumerable<string>>
+                {
+                    { DevicePlatform.Android, new[] { "image/*" } },
+                    { DevicePlatform.iOS, new[] { "public.image" } },
+                    { DevicePlatform.WinUI, new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" } }
+                });
+            var options = new PickOptions
+            {
+                PickerTitle = "Выберите изображение",
+                FileTypes = customFileType,
+            };
+            var image = await FilePicker.Default.PickAsync(options);
             if (image == null) return null;
-
+            var fileInfo = new FileInfo(image.FullPath);
             return new ImageItemModel(
                 fileName: image.FileName,
                 filePath: Path.GetDirectoryName(image.FullPath)!,
                 fullPath: image.FullPath,
-                size: new FileInfo(image.FullPath).Length,
+                size: fileInfo.Length,
                 lastModified: DateTime.Now,
                 labels: new());
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Ошибка при выборе файла: {ex.Message}");
             return null;
         }
     }
