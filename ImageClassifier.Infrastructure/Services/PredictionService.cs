@@ -32,7 +32,7 @@ namespace ImageClassifier.Infrastructure.Services
                 {
                     var bytes = await _imageResizeService.ResizeTo224(item.FullPath);
                     if (bytes != null)
-                        _imagesData.Add(new ImageData { ImageBytes = bytes, Label = "Positive", FullPath = item.FullPath });
+                        _imagesData.Add(new ImageData { ImageBytes = bytes, FullPath = item.FullPath });
                 });
             }
             await _taskCommanderService.WaitForAllAsync();

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui.Storage;
 using ImageClassifier.Core.Interfaces;
+using ImageClassifier.Core.Models;
 using ImageClassifier.Infrastructure.Services;
 using ImageClassifier.ViewModel.ViewModels;
 using System.Runtime.Versioning;
@@ -26,7 +27,7 @@ namespace ImageClassifier.Extensions
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddSingleton<IFolderPicker, DeferredFolderPicker>();
-            services.AddSingleton<IFileStorageService, JsonFileStorageService>();
+            services.AddSingleton<IJsonStorageService<ImageItemModel>>(sp => new JsonStorageService<ImageItemModel>("loaded_files.json"));
             services.AddSingleton<IDialogService, MauiDialogService>();
             services.AddSingleton<IMediaPickerService, MediaPickerService>();
             services.AddSingleton<IFileScanner, FileScanner>();

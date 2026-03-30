@@ -17,6 +17,7 @@
                             StrokeThickness="1">
                         <Grid>
                             <Entry Placeholder="Введите название метки"
+                                   PlaceholderColor="LightGray"
                                    FontSize="16"
                                    MaxLength="30"
                                    WidthRequest="240"
@@ -35,11 +36,13 @@
                             Command="{Binding TrainMenu.AcceptCommand}"
                             IsEnabled="{Binding TrainMenu.AcceptButtonIsEnabled}"
                             HorizontalOptions="Start"
-                            VerticalOptions="Center" />
+                            VerticalOptions="Center"
+                            WidthRequest="100"/>
                     <Button Text="Отмена"
                             Command="{Binding TrainMenu.CancelCommand}"
                             HorizontalOptions="Start"
-                            VerticalOptions="Center" />
+                            VerticalOptions="Center"
+                            WidthRequest="100"/>
                 </HorizontalStackLayout>
             </Grid>
         </Border>

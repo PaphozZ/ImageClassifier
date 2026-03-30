@@ -8,7 +8,7 @@ namespace ImageClassifier.ViewModel.ViewModels
 {
     public partial class FileCollectionViewModel : ObservableObject
     {
-        private readonly IFileStorageService _storageService;
+        private readonly IJsonStorageService<ImageItemModel> _storageService;
         private readonly IFileScanner _fileScanner;
         private readonly IImageResizeService _imageResizeService;
         private readonly ITaskCommanderService _taskCommanderService;
@@ -22,7 +22,7 @@ namespace ImageClassifier.ViewModel.ViewModels
         private ObservableCollection<ImageItemViewModel> _negativeItems = new();
 
         public FileCollectionViewModel(
-            IFileStorageService storageService,
+            IJsonStorageService<ImageItemModel> storageService,
             IFileScanner fileScanner,
             IImageResizeService imageResizeService,
             ITaskCommanderService taskCommanderService)
