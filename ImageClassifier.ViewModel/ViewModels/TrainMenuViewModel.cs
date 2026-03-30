@@ -43,6 +43,7 @@ namespace ImageClassifier.ViewModel.ViewModels
 
         public async Task Show()
         {
+            NewLabel = string.Empty;
             _labels.Clear();
             var modelModels = await _modelManagerService.GetAllModelsAsync();
             foreach (var model in modelModels)
