@@ -37,7 +37,7 @@ public partial class WorkflowViewModel : ObservableObject
         }
     }
 
-    public async Task Predict()
+    public async Task Predict(string label)
     {
         List<ImageItemModel> classificationModels = new();
         if (_fileCollection.PositiveItems.Count == 0)
@@ -53,7 +53,7 @@ public partial class WorkflowViewModel : ObservableObject
                 .Select(f => f.ToModel())
                 .ToList();
         }
-        var labeledModels = await _predictionService.ApplyPredictionsAsync(classificationModels);
+        var labeledModels = await _predictionService.ApplyPredictionsAsync(classificationModels, label);
         await _fileCollection.FillLabelsAsync(labeledModels);
     }
 }

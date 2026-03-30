@@ -15,6 +15,7 @@ public partial class PreviewViewModel : ObservableObject
     public WorkflowViewModel Workflow { get; }
     public TrainMenuViewModel TrainMenu { get; }
     public ModeManagerViewModel ModeManager { get; }
+    public PredictMenuViewModel PredictMenu { get; }
 
     private readonly IFolderPicker _folderPicker;
     private readonly IDialogService _dialogService;
@@ -29,7 +30,8 @@ public partial class PreviewViewModel : ObservableObject
         ModeManagerViewModel modeManager,
         IFolderPicker folderPicker,
         IDialogService dialogService,
-        IMediaPickerService mediaPickerService)
+        IMediaPickerService mediaPickerService,
+        PredictMenuViewModel predictMenu)
     {
         FileCollection = fileCollection;
         Fullscreen = fullscreen;
@@ -41,6 +43,7 @@ public partial class PreviewViewModel : ObservableObject
         _folderPicker = folderPicker;
         _dialogService = dialogService;
         _mediaPickerService = mediaPickerService;
+        PredictMenu = predictMenu;
     }
 
 
@@ -85,14 +88,14 @@ public partial class PreviewViewModel : ObservableObject
         switch (ModeManager.CurrentMode)
         {
             case AppMode.Preview:
-                TrainMenu.Show();
+                await TrainMenu.Show();
                 break;
             case AppMode.Train:
                 ModeManager.SelectMode(AppMode.Preview);
                 break;
             case AppMode.Predict:
                 ModeManager.SelectMode(AppMode.Processing);
-                await Workflow.Predict();
+                await Workflow.Predict(PredictMenu.SelectedLabel);
                 ModeManager.SelectMode(AppMode.Predict);
                 break;
         }
@@ -104,7 +107,7 @@ public partial class PreviewViewModel : ObservableObject
         switch (ModeManager.CurrentMode)
         {
             case AppMode.Preview:
-                ModeManager.SelectMode(AppMode.Predict);
+                await PredictMenu.Show();
                 break;
             case AppMode.Predict:
                 ModeManager.SelectMode(AppMode.Preview);

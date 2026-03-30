@@ -41,7 +41,7 @@ public partial class ImageItemViewModel : ObservableObject
         LastModified = model.LastModified;
 
         foreach (var label in model.Labels)
-            Labels.Add(new(label.Name, label.Probability, label.ModelId, label.LastModified));
+            Labels.Add(new(label.Name, label.Probability, label.LastModified));
 
         _taskCommanderService.AddTask(LoadThumbnailAsync);
     }

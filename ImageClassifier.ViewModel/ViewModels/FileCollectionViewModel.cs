@@ -89,7 +89,6 @@ namespace ImageClassifier.ViewModel.ViewModels
                     var label = new LabelViewModel(
                         name: labelData.Name,
                         probability: labelData.Probability,
-                        modelId: labelData.ModelId,
                         lastModified: labelData.LastModified
                     );
                     file.Labels.Add(label);

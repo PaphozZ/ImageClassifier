@@ -19,6 +19,7 @@ namespace ImageClassifier.Extensions
             services.AddSingleton<WorkflowViewModel>();
             services.AddTransient<DragDropManagerViewModel>();
             services.AddTransient<TrainMenuViewModel>();
+            services.AddTransient<PredictMenuViewModel>();
             services.AddSingleton<ModeManagerViewModel>();
             return services;
         }
@@ -28,6 +29,7 @@ namespace ImageClassifier.Extensions
         {
             services.AddSingleton<IFolderPicker, DeferredFolderPicker>();
             services.AddSingleton<IJsonStorageService<ImageItemModel>>(sp => new JsonStorageService<ImageItemModel>("loaded_files.json"));
+            services.AddSingleton<IJsonStorageService<ModelItemModel>>(sp => new JsonStorageService<ModelItemModel>("models.json"));
             services.AddSingleton<IDialogService, MauiDialogService>();
             services.AddSingleton<IMediaPickerService, MediaPickerService>();
             services.AddSingleton<IFileScanner, FileScanner>();
@@ -35,6 +37,7 @@ namespace ImageClassifier.Extensions
             services.AddSingleton<ITaskCommanderService>(sp => new TaskCommanderService(Environment.ProcessorCount - 1));
             services.AddSingleton<IModelTrainingService, ModelTrainingService>();
             services.AddSingleton<IPredictionService, PredictionService>();
+            services.AddSingleton<IModelManagerService, ModelManagerService>();
             return services;
         }
     }

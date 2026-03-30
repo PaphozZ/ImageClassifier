@@ -13,6 +13,7 @@ public class ModelTrainingService : IModelTrainingService
     private readonly ITaskCommanderService _taskCommanderService;
     private readonly IDialogService _mauiDialogService;
     private readonly IImageResizeService _imageResizeService;
+    private readonly IModelManagerService _modelManager;
 
     private readonly ConcurrentBag<ImageData> _imagesData = new();
     private readonly string _workSpacePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "model_workspace");
@@ -20,11 +21,13 @@ public class ModelTrainingService : IModelTrainingService
     public ModelTrainingService(
         ITaskCommanderService taskCommanderService, 
         IDialogService mauiDialogService, 
-        IImageResizeService imageResizeService)
+        IImageResizeService imageResizeService,
+        IModelManagerService modelManager)
     {
         _taskCommanderService = taskCommanderService;
         _mauiDialogService = mauiDialogService;
         _imageResizeService = imageResizeService;
+        _modelManager = modelManager;
     }
 
     private async Task PrepareImagesDataAsync(IEnumerable<ImageItemModel> positiveItems, IEnumerable<ImageItemModel> negativeItems, string label)
@@ -79,9 +82,11 @@ public class ModelTrainingService : IModelTrainingService
             .Append(mlContext.Transforms.Conversion.MapKeyToValue("PredictedLabel"));
 
         await Task.Run(() => trainedModel = pipeline.Fit(data));
-        mlContext.Model.Save(trainedModel, data.Schema, Path.Combine(_workSpacePath, "model.zip"));
+        using var ms = new MemoryStream();
+        mlContext.Model.Save(trainedModel, data.Schema, ms);
 
         _imagesData.Clear();
+        await _modelManager.SaveModelAsync(new(label), ms.ToArray());
         await _mauiDialogService.DisplayAlert("Сообщение", "Модель обучена и сохранена!", "OK");
     }
 }

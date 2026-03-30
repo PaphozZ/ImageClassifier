@@ -6,20 +6,22 @@ using System.Collections.ObjectModel;
 
 namespace ImageClassifier.ViewModel.ViewModels
 {
-    public partial class TrainMenuViewModel : ObservableObject
+    public partial class PredictMenuViewModel : ObservableObject
     {
         private readonly IModelManagerService _modelManagerService;
         private readonly ModeManagerViewModel _modeManagerViewModel;
 
         [ObservableProperty]
-        private bool _trainMenuIsVisible;
+        private bool _PredictMenuIsVisible;
         [ObservableProperty]
         private bool _acceptButtonIsEnabled;
 
-        private string _newLabel = string.Empty;
+        [ObservableProperty]
         private ObservableCollection<string> _labels = new();
 
-        public TrainMenuViewModel(
+        private string _selectedLabel = string.Empty;
+
+        public PredictMenuViewModel(
             ModeManagerViewModel modeManagerViewModel,
             IModelManagerService modelManagerService)
         {
@@ -27,42 +29,42 @@ namespace ImageClassifier.ViewModel.ViewModels
             _modelManagerService = modelManagerService;
         }
 
-        public string NewLabel
+        public string SelectedLabel
         {
-            get => _newLabel;
+            get => _selectedLabel;
             set
             {
-                if (_newLabel != value)
+                if (_selectedLabel != value)
                 {
-                    _newLabel = value;
-                    AcceptButtonIsEnabled = !string.IsNullOrEmpty(_newLabel) && !_labels.Contains(_newLabel);
-                    OnPropertyChanged(nameof(NewLabel));
+                    _selectedLabel = value;
+                    AcceptButtonIsEnabled = !string.IsNullOrEmpty(_selectedLabel);
+                    OnPropertyChanged(nameof(SelectedLabel));
                 }
             }
         }
 
         public async Task Show()
         {
-            _labels.Clear();
+            Labels.Clear();
             var modelModels = await _modelManagerService.GetAllModelsAsync();
             foreach (var model in modelModels)
             {
-                _labels.Add(model.LabelName);
+                Labels.Add(model.LabelName);
             }
-            TrainMenuIsVisible = true;
+            PredictMenuIsVisible = true;
         }
 
         [RelayCommand]
         public void Accept()
         {
-            TrainMenuIsVisible = false;
-            _modeManagerViewModel.SelectMode(AppMode.Train);
+            PredictMenuIsVisible = false;
+            _modeManagerViewModel.SelectMode(AppMode.Predict);
         }
 
         [RelayCommand]
         public void Cancel()
         {
-            TrainMenuIsVisible = false;
+            PredictMenuIsVisible = false;
         }
     }
 }

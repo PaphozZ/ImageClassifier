@@ -9,19 +9,21 @@ namespace ImageClassifier.Infrastructure.Services
     public class PredictionService : IPredictionService
     {
         private readonly ITaskCommanderService _taskCommanderService;
-        private readonly IDialogService _mauiDialogService;
+        private readonly IDialogService _dialogService;
         private readonly IImageResizeService _imageResizeService;
+        private readonly IModelManagerService _modelManager;
 
         private readonly ConcurrentBag<ImageData> _imagesData = new();
-        private readonly string _workSpacePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "model_workspace");
 
         public PredictionService(ITaskCommanderService taskCommanderService,
             IDialogService mauiDialogService,
-            IImageResizeService imageResizeService)
+            IImageResizeService imageResizeService,
+            IModelManagerService modelManager)
         {
             _taskCommanderService = taskCommanderService;
-            _mauiDialogService = mauiDialogService;
+            _dialogService = mauiDialogService;
             _imageResizeService = imageResizeService;
+            _modelManager = modelManager;
         }
 
         private async Task PrepareImagesDataAsync(IEnumerable<ImageItemModel> items)
@@ -38,33 +40,34 @@ namespace ImageClassifier.Infrastructure.Services
             await _taskCommanderService.WaitForAllAsync();
         }
 
-        public async Task<IEnumerable<ImageItemModel>> ApplyPredictionsAsync(IEnumerable<ImageItemModel> items)
+        public async Task<IEnumerable<ImageItemModel>> ApplyPredictionsAsync(IEnumerable<ImageItemModel> items, string label)
         {
             MLContext mlContext = new();
             ITransformer trainedModel = null!;
 
-            var modelPath = Path.Combine(_workSpacePath, "model.zip");
-            if (!File.Exists(modelPath) || !items.Any())
+            var modelData = await _modelManager.LoadModelDataAsync(label);
+            if (modelData == null)
             {
-                await _mauiDialogService.DisplayAlert("Сообщение", "Сначала обучите модель и выберите изображения!", "OK");
+                await _dialogService.DisplayAlert("Сообщение", "Модели с указанной меткой не обнаружено!", "OK");
                 return Enumerable.Empty<ImageItemModel>();
             }
             if (_taskCommanderService.IsProcessing)
             {
-                await _mauiDialogService.DisplayAlert("Сообщение", "Классификация начнется после завершения фоновых задач", "OK");
+                await _dialogService.DisplayAlert("Сообщение", "Классификация начнется после завершения фоновых задач", "OK");
             }
-
             _taskCommanderService.AddTask(() => Task.Run(() =>
             {
-                using var stream = new FileStream(modelPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                trainedModel = mlContext.Model.Load(stream, out _);
+                using (var stream = new MemoryStream(modelData))
+                {
+                    trainedModel = mlContext.Model.Load(stream, out _);
+                }
             }), true);
             await PrepareImagesDataAsync(items);
 
             var labeledItems = await PredictBatchAsync(mlContext, trainedModel, items);
 
             _imagesData.Clear();
-            await _mauiDialogService.DisplayAlert("Сообщение", "Классификация изображений выполнена!", "OK");
+            await _dialogService.DisplayAlert("Сообщение", "Классификация изображений выполнена!", "OK");
             return labeledItems;
         }
 
@@ -87,7 +90,6 @@ namespace ImageClassifier.Infrastructure.Services
                             item.Labels.Add(new LabelModel(
                                 name: predictedLabel!,
                                 probability: probability,
-                                modelId: Guid.NewGuid(),
                                 lastModified: DateTime.Now));
                             results.Add(item);
                         }

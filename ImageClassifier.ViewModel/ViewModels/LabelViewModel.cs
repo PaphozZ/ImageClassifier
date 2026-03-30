@@ -11,11 +11,10 @@ namespace ImageClassifier.ViewModel.ViewModels
         public Guid ModelId { get; }
         public DateTime LastModified { get; }
 
-        public LabelViewModel(string name, float probability, Guid modelId, DateTime lastModified) 
+        public LabelViewModel(string name, float probability, DateTime lastModified) 
         {
             Name = name;
             Probability = probability;
-            ModelId = modelId;
             LastModified = lastModified;
         }
 
@@ -24,7 +23,6 @@ namespace ImageClassifier.ViewModel.ViewModels
             return new LabelModel(
                 name: Name,
                 probability: Probability,
-                modelId: ModelId,
                 lastModified: LastModified);
         }
     }

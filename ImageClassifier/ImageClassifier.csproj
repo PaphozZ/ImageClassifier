@@ -96,6 +96,9 @@
 	  <MauiXaml Update="Views\ImageListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\PredictMenuView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\SampleView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

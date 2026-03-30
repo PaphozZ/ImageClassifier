@@ -16,5 +16,6 @@
 
         <local:FullscreenView Grid.ColumnSpan="2" />
         <local:TrainMenuView Grid.ColumnSpan="2" />
+        <local:PredictMenuView Grid.ColumnSpan="2" />
     </Grid>
 </ContentView>
