@@ -114,7 +114,10 @@ public partial class PreviewViewModel : ObservableObject
                 break;
             case AppMode.Train:
                 ModeManager.SelectMode(AppMode.Processing);
-                await Workflow.Train(TrainMenu.NewLabel);
+                var label = string.IsNullOrEmpty(TrainMenu.NewLabel)
+                    ? TrainMenu.SelectedLabel
+                    : TrainMenu.NewLabel;
+                await Workflow.Train(label);
                 ModeManager.SelectMode(AppMode.Train);
                 break;
         }

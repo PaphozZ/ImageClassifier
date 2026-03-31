@@ -51,6 +51,7 @@ namespace ImageClassifier.ViewModel.ViewModels
             {
                 Labels.Add(model.LabelName);
             }
+            SelectedLabel = Labels.LastOrDefault() ?? string.Empty;
             PredictMenuIsVisible = true;
         }
 

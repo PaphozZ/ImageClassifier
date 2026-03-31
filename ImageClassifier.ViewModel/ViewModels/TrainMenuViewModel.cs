@@ -15,8 +15,15 @@ namespace ImageClassifier.ViewModel.ViewModels
         private bool _trainMenuIsVisible;
         [ObservableProperty]
         private bool _acceptButtonIsEnabled;
+        [ObservableProperty]
+        private bool _entryIsEnabled = true;
+        [ObservableProperty]
+        private string _placeholderText = "Введите название метки";
 
         private string _newLabel = string.Empty;
+        private string _selectedLabel = string.Empty;
+
+        [ObservableProperty]
         private ObservableCollection<string> _labels = new();
 
         public TrainMenuViewModel(
@@ -35,8 +42,29 @@ namespace ImageClassifier.ViewModel.ViewModels
                 if (_newLabel != value)
                 {
                     _newLabel = value;
-                    AcceptButtonIsEnabled = !string.IsNullOrEmpty(_newLabel) && !_labels.Contains(_newLabel);
+                    AcceptButtonIsEnabled = !string.IsNullOrEmpty(_newLabel) 
+                        && _newLabel != "Новая метка";
                     OnPropertyChanged(nameof(NewLabel));
+                }
+            }
+        }
+
+        public string SelectedLabel
+        {
+            get => _selectedLabel;
+            set
+            {
+                if (_selectedLabel != value)
+                {
+                    NewLabel = string.Empty;
+                    _selectedLabel = value;
+                    EntryIsEnabled = _selectedLabel == "Новая метка";
+                    PlaceholderText = _selectedLabel == "Новая метка" 
+                        ? "Введите название метки" 
+                        : "Метка будет дополнена";
+                    AcceptButtonIsEnabled = !string.IsNullOrEmpty(_selectedLabel) 
+                        && _selectedLabel != "Новая метка";
+                    OnPropertyChanged(nameof(SelectedLabel));
                 }
             }
         }
@@ -44,12 +72,14 @@ namespace ImageClassifier.ViewModel.ViewModels
         public async Task Show()
         {
             NewLabel = string.Empty;
-            _labels.Clear();
+            Labels.Clear();
             var modelModels = await _modelManagerService.GetAllModelsAsync();
             foreach (var model in modelModels)
             {
-                _labels.Add(model.LabelName);
+                Labels.Add(model.LabelName);
             }
+            Labels.Add("Новая метка");
+            SelectedLabel = Labels.LastOrDefault()!;
             TrainMenuIsVisible = true;
         }
 

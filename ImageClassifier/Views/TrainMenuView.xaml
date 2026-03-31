@@ -15,8 +15,15 @@
                     <Border StrokeShape="RoundRectangle 10"
                             Stroke="Black"
                             StrokeThickness="1">
-                        <Grid>
-                            <Entry Placeholder="Введите название метки"
+                        <VerticalStackLayout>
+                            <Picker ItemsSource="{Binding TrainMenu.Labels}"
+                                    SelectedItem="{Binding TrainMenu.SelectedLabel}"
+                                    FontSize="16"
+                                    WidthRequest="240"
+                                    HeightRequest="20"
+                                    HorizontalTextAlignment="Center"
+                                    VerticalTextAlignment="Center" />
+                            <Entry Placeholder="{Binding TrainMenu.PlaceholderText}"
                                    PlaceholderColor="LightGray"
                                    FontSize="16"
                                    MaxLength="30"
@@ -24,8 +31,9 @@
                                    HeightRequest="20"
                                    HorizontalTextAlignment="Center"
                                    VerticalTextAlignment="Center"
-                                   Text="{Binding TrainMenu.NewLabel}"/>
-                        </Grid>
+                                   Text="{Binding TrainMenu.NewLabel}"
+                                   IsEnabled="{Binding TrainMenu.EntryIsEnabled}"/>
+                            </VerticalStackLayout>
                     </Border>
                 </StackLayout>
                 <HorizontalStackLayout HorizontalOptions="Center"

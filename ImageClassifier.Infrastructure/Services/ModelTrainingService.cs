@@ -11,7 +11,7 @@ namespace ImageClassifier.Infrastructure.Services;
 public class ModelTrainingService : IModelTrainingService
 {
     private readonly ITaskCommanderService _taskCommanderService;
-    private readonly IDialogService _mauiDialogService;
+    private readonly IDialogService _dialogService;
     private readonly IImageResizeService _imageResizeService;
     private readonly IModelManagerService _modelManager;
 
@@ -20,12 +20,12 @@ public class ModelTrainingService : IModelTrainingService
 
     public ModelTrainingService(
         ITaskCommanderService taskCommanderService, 
-        IDialogService mauiDialogService, 
+        IDialogService dialogService, 
         IImageResizeService imageResizeService,
         IModelManagerService modelManager)
     {
         _taskCommanderService = taskCommanderService;
-        _mauiDialogService = mauiDialogService;
+        _dialogService = dialogService;
         _imageResizeService = imageResizeService;
         _modelManager = modelManager;
     }
@@ -61,7 +61,18 @@ public class ModelTrainingService : IModelTrainingService
 
         if (_taskCommanderService.IsProcessing) 
         {
-            await _mauiDialogService.DisplayAlert("Сообщение", "Обучение начнется после завершения фоновых задач", "OK");
+            await _dialogService.DisplayAlert("Сообщение", "Обучение начнется после завершения фоновых задач", "OK");
+        }
+        var modelData = await _modelManager.LoadModelDataAsync(label);
+        if (modelData != null)
+        {
+            _taskCommanderService.AddTask(() => Task.Run(() =>
+            {
+                using (var stream = new MemoryStream(modelData))
+                {
+                    trainedModel = mlContext.Model.Load(stream, out _);
+                }
+            }), true);
         }
         await PrepareImagesDataAsync(positiveItems, negativeItems, label);
 
@@ -87,6 +98,6 @@ public class ModelTrainingService : IModelTrainingService
 
         _imagesData.Clear();
         await _modelManager.SaveModelAsync(new(label), ms.ToArray());
-        await _mauiDialogService.DisplayAlert("Сообщение", "Модель обучена и сохранена!", "OK");
+        await _dialogService.DisplayAlert("Сообщение", "Модель обучена и сохранена!", "OK");
     }
 }
