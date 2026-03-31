@@ -26,7 +26,7 @@ namespace ImageClassifier.Infrastructure.Services
             _modelManager = modelManager;
         }
 
-        private async Task PrepareImagesDataAsync(IEnumerable<ImageItemModel> items)
+        private void PrepareImagesDataAsync(IEnumerable<ImageItemModel> items)
         {
             foreach (var item in items)
             {
@@ -37,43 +37,59 @@ namespace ImageClassifier.Infrastructure.Services
                         _imagesData.Add(new ImageData { ImageBytes = bytes, FullPath = item.FullPath });
                 });
             }
-            await _taskCommanderService.WaitForAllAsync();
         }
 
-        public async Task<IEnumerable<ImageItemModel>> ApplyPredictionsAsync(IEnumerable<ImageItemModel> items, string label)
+        public async Task<IEnumerable<ImageItemModel>> ApplyPredictionsAsync(IEnumerable<ImageItemModel> items, IEnumerable<string> labels)
         {
             MLContext mlContext = new();
             ITransformer trainedModel = null!;
 
-            var modelData = await _modelManager.LoadModelDataAsync(label);
-            if (modelData == null)
-            {
-                await _dialogService.DisplayAlert("Сообщение", "Модели с указанной меткой не обнаружено!", "OK");
-                return Enumerable.Empty<ImageItemModel>();
-            }
             if (_taskCommanderService.IsProcessing)
             {
                 await _dialogService.DisplayAlert("Сообщение", "Классификация начнется после завершения фоновых задач", "OK");
             }
-            _taskCommanderService.AddTask(() => Task.Run(() =>
+            PrepareImagesDataAsync(items);
+
+            List<ImageItemModel> labeledItems = new();
+            foreach (var label in labels)
             {
-                using (var stream = new MemoryStream(modelData))
+                var modelData = await _modelManager.LoadModelDataAsync(label);
+                if (modelData == null)
                 {
-                    trainedModel = mlContext.Model.Load(stream, out _);
+                    await _dialogService.DisplayAlert("Сообщение", $"Модели с меткой \"{label}\" не обнаружено!", "OK");
+                    continue;
                 }
-            }), true);
-            await PrepareImagesDataAsync(items);
+                _taskCommanderService.AddTask(() => Task.Run(() =>
+                {
+                    using (var stream = new MemoryStream(modelData))
+                    {
+                        trainedModel = mlContext.Model.Load(stream, out _);
+                    }
+                }), true);
+                await _taskCommanderService.WaitForAllAsync();
 
-            var labeledItems = await PredictBatchAsync(mlContext, trainedModel, items);
-
+                var labeledBatch = await PredictBatchAsync(mlContext, trainedModel, items, label);
+                foreach (var batchItem in labeledBatch) 
+                {
+                    var labeledItem = labeledItems.FirstOrDefault(i => i.FullPath == batchItem.FullPath);
+                    if (labeledItem == null)
+                    {
+                        labeledItems.Add(batchItem);
+                    }
+                    else 
+                    {
+                        labeledItem.Labels.AddRange(batchItem.Labels);
+                    }
+                }
+            }
             _imagesData.Clear();
             await _dialogService.DisplayAlert("Сообщение", "Классификация изображений выполнена!", "OK");
             return labeledItems;
         }
 
-        private async Task<IEnumerable<ImageItemModel>> PredictBatchAsync(MLContext mlContext, ITransformer model, IEnumerable<ImageItemModel> items)
+        private async Task<IEnumerable<ImageItemModel>> PredictBatchAsync(MLContext mlContext, ITransformer model, IEnumerable<ImageItemModel> items, string label)
         {
-            return await Task.Run(() =>
+            return await Task.Run(async () =>
                 {
                     var predictionEngine = mlContext.Model.CreatePredictionEngine<ImageData, ModelOutput>(model);
                     var results = new List<ImageItemModel>();
@@ -83,6 +99,8 @@ namespace ImageClassifier.Infrastructure.Services
                         var prediction = predictionEngine.Predict(new ImageData { ImageBytes = data.ImageBytes });
                         var predictedLabel = prediction.PredictedLabel;
                         var probability = prediction.Score?.Max() ?? 0;
+                        var model = await _modelManager.GetModelByLabelAsync(label);
+                        var modifiedDate = model?.LastModified;
 
                         var item = items.FirstOrDefault(i => i.FullPath == data.FullPath);
                         if (item != null && data.FullPath != null && predictedLabel != "Negative" && !string.IsNullOrEmpty(predictedLabel))
@@ -90,7 +108,7 @@ namespace ImageClassifier.Infrastructure.Services
                             item.Labels.Add(new LabelModel(
                                 name: predictedLabel!,
                                 probability: probability,
-                                lastModified: DateTime.Now));
+                                lastModified: modifiedDate ?? throw new InvalidOperationException()));
                             results.Add(item);
                         }
                     }

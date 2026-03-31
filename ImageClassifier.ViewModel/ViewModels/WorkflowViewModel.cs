@@ -37,23 +37,22 @@ public partial class WorkflowViewModel : ObservableObject
         }
     }
 
-    public async Task Predict(string label)
+    public async Task Predict(IEnumerable<string> labels)
     {
-        List<ImageItemModel> classificationModels = new();
+        List<ImageItemViewModel> viewModels = new();
         if (_fileCollection.PositiveItems.Count == 0)
         {
-            classificationModels = _fileCollection.Files
-                .Where(f => !_fileCollection.NegativeItems.Any(n => n.FullPath == f.FullPath) && !f.IsDeleted)
-                .Select(f => f.ToModel())
+            viewModels = _fileCollection.Files
+                .Where(f => !_fileCollection.NegativeItems
+                .Any(n => n.FullPath == f.FullPath) && !f.IsDeleted)
                 .ToList();
         }
         else if (_fileCollection.NegativeItems.Count == 0)
         {
-            classificationModels = _fileCollection.PositiveItems
-                .Select(f => f.ToModel())
-                .ToList();
+            viewModels = _fileCollection.PositiveItems.ToList();
         }
-        var labeledModels = await _predictionService.ApplyPredictionsAsync(classificationModels, label);
-        await _fileCollection.FillLabelsAsync(labeledModels);
+        List<ImageItemModel> models = viewModels.Select(f => f.ToModel()).ToList();
+        var labeledModels = await _predictionService.ApplyPredictionsAsync(models, labels);
+        await _fileCollection.FillLabelsAsync(labeledModels, viewModels, labels);
     }
 }

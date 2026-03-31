@@ -95,7 +95,10 @@ public partial class PreviewViewModel : ObservableObject
                 break;
             case AppMode.Predict:
                 ModeManager.SelectMode(AppMode.Processing);
-                await Workflow.Predict(PredictMenu.SelectedLabel);
+                var labels = PredictMenu.CheckBoxIsChecked
+                    ? [.. PredictMenu.Labels]
+                    : new[] { PredictMenu.SelectedLabel };
+                await Workflow.Predict(labels);
                 ModeManager.SelectMode(AppMode.Predict);
                 break;
         }

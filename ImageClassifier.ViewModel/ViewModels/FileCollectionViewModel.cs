@@ -78,20 +78,32 @@ namespace ImageClassifier.ViewModel.ViewModels
             await _storageService.SaveFilesAsync(models);
         }
 
-        public async Task FillLabelsAsync(IEnumerable<ImageItemModel> items)
+        public async Task FillLabelsAsync(
+            IEnumerable<ImageItemModel> labeledModels,
+            IEnumerable<ImageItemViewModel> viewModels,
+            IEnumerable<string> labels)
         {
-            foreach (var item in items)
+            var modelDict = labeledModels.ToDictionary(m => m.FullPath);
+            var allowedSet = new HashSet<string>(labels);
+
+            foreach (var vm in viewModels)
             {
-                var file = Files.FirstOrDefault(f => f.FullPath == item.FullPath);
-                var labelData = item.Labels.LastOrDefault();
-                if (file != null && labelData != null)
+                modelDict.TryGetValue(vm.FullPath, out var model);
+
+                foreach (var labelName in allowedSet)
                 {
-                    var label = new LabelViewModel(
-                        name: labelData.Name,
-                        probability: labelData.Probability,
-                        lastModified: labelData.LastModified
-                    );
-                    file.Labels.Add(label);
+                    var existing = vm.Labels.Where(l => l.Name == labelName).ToList();
+                    var labelData = model?.Labels.FirstOrDefault(l => l.Name == labelName);
+
+                    if (existing != null)
+                    {
+                        foreach (var a in existing)
+                            vm.Labels.Remove(a);
+                    }
+                    if (labelData != null)
+                    {
+                        vm.Labels.Add(new LabelViewModel(labelData.Name, labelData.Probability, labelData.LastModified));
+                    }
                 }
             }
             await SaveAsync();

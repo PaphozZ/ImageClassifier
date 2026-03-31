@@ -43,7 +43,8 @@ namespace ImageClassifier.ViewModel.ViewModels
                 {
                     _newLabel = value;
                     AcceptButtonIsEnabled = !string.IsNullOrEmpty(_newLabel) 
-                        && _newLabel != "Новая метка";
+                        && _newLabel != "Новая метка"
+                        && !Labels.Contains(_newLabel);
                     OnPropertyChanged(nameof(NewLabel));
                 }
             }

@@ -12,9 +12,13 @@ namespace ImageClassifier.ViewModel.ViewModels
         private readonly ModeManagerViewModel _modeManagerViewModel;
 
         [ObservableProperty]
-        private bool _PredictMenuIsVisible;
+        private bool _predictMenuIsVisible;
         [ObservableProperty]
         private bool _acceptButtonIsEnabled;
+        [ObservableProperty]
+        private bool _checkBoxIsChecked = false;
+        [ObservableProperty]
+        private bool _pickerIsEnabled = true;
 
         [ObservableProperty]
         private ObservableCollection<string> _labels = new();
@@ -27,6 +31,11 @@ namespace ImageClassifier.ViewModel.ViewModels
         {
             _modeManagerViewModel = modeManagerViewModel;
             _modelManagerService = modelManagerService;
+        }
+
+        partial void OnCheckBoxIsCheckedChanged(bool value)
+        {
+            PickerIsEnabled = !value;
         }
 
         public string SelectedLabel

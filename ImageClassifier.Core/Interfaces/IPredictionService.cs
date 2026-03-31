@@ -4,6 +4,6 @@ namespace ImageClassifier.Core.Interfaces
 {
     public interface IPredictionService
     {
-        Task<IEnumerable<ImageItemModel>> ApplyPredictionsAsync(IEnumerable<ImageItemModel> items, string label);
+        Task<IEnumerable<ImageItemModel>> ApplyPredictionsAsync(IEnumerable<ImageItemModel> items, IEnumerable<string> labels);
     }
 }
