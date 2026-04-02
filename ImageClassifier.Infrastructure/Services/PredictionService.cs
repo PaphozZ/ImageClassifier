@@ -10,19 +10,16 @@ namespace ImageClassifier.Infrastructure.Services
     {
         private readonly ITaskCommanderService _taskCommanderService;
         private readonly IDialogService _dialogService;
-        private readonly IImageResizeService _imageResizeService;
         private readonly IModelManagerService _modelManager;
 
         private readonly ConcurrentBag<ImageData> _imagesData = new();
 
         public PredictionService(ITaskCommanderService taskCommanderService,
             IDialogService mauiDialogService,
-            IImageResizeService imageResizeService,
             IModelManagerService modelManager)
         {
             _taskCommanderService = taskCommanderService;
             _dialogService = mauiDialogService;
-            _imageResizeService = imageResizeService;
             _modelManager = modelManager;
         }
 

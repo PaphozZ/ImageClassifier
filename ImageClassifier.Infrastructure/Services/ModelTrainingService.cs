@@ -12,43 +12,75 @@ public class ModelTrainingService : IModelTrainingService
 {
     private readonly ITaskCommanderService _taskCommanderService;
     private readonly IDialogService _dialogService;
-    private readonly IImageResizeService _imageResizeService;
+    private readonly IImageTransformationService _imageTransformationService;
     private readonly IModelManagerService _modelManager;
 
     private readonly ConcurrentBag<ImageData> _imagesData = new();
     private readonly string _workSpacePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "model_workspace");
 
     public ModelTrainingService(
-        ITaskCommanderService taskCommanderService, 
-        IDialogService dialogService, 
-        IImageResizeService imageResizeService,
+        ITaskCommanderService taskCommanderService,
+        IDialogService dialogService,
+        IImageTransformationService imageTransformationService,
         IModelManagerService modelManager)
     {
         _taskCommanderService = taskCommanderService;
         _dialogService = dialogService;
-        _imageResizeService = imageResizeService;
+        _imageTransformationService = imageTransformationService;
         _modelManager = modelManager;
     }
 
     private async Task PrepareImagesDataAsync(IEnumerable<ImageItemModel> positiveItems, IEnumerable<ImageItemModel> negativeItems, string label)
     {
+        int positiveCount = 0;
         foreach (var item in positiveItems)
         {
             var fileInfo = new FileInfo(item.FullPath);
             if (fileInfo.Exists && fileInfo.Length > 0)
             {
                 _imagesData.Add(new ImageData { ImagePath = item.FullPath, Label = label });
+                positiveCount++;
             }
         }
+        int negativeCount = 0;
         foreach (var item in negativeItems)
         {
             var fileInfo = new FileInfo(item.FullPath);
             if (fileInfo.Exists && fileInfo.Length > 0)
             {
                 _imagesData.Add(new ImageData { ImagePath = item.FullPath, Label = "Negative" });
+                negativeCount++;
             }
         }
+        if (positiveCount != negativeCount)
+        {
+            _taskCommanderService.AddTask(async () =>
+            {
+                bool positiveLarger = positiveCount > negativeCount;
+                string minorityLabel = positiveLarger ? "Negative" : label;
+                int needed = Math.Abs(positiveCount - negativeCount);
 
+                var minorityPaths = _imagesData
+                    .Where(p => p.Label == minorityLabel)
+                    .Select(p => p.ImagePath)
+                    .ToList();
+
+                var newPaths = await _imageTransformationService.AugmentImages(minorityPaths, needed);
+                if (newPaths == null) return;
+
+                foreach (var path in newPaths)
+                {
+                    if (path != null)
+                    {
+                        _imagesData.Add(new ImageData
+                        {
+                            ImagePath = path,
+                            Label = minorityLabel
+                        });
+                    }
+                }
+            });
+        }
         await _taskCommanderService.WaitForAllAsync();
     }
 
@@ -57,7 +89,7 @@ public class ModelTrainingService : IModelTrainingService
         MLContext mlContext = new();
         ITransformer trainedModel = null!;
 
-        if (_taskCommanderService.IsProcessing) 
+        if (_taskCommanderService.IsProcessing)
         {
             await _dialogService.DisplayAlert("Сообщение", "Обучение начнется после завершения фоновых задач", "OK");
         }

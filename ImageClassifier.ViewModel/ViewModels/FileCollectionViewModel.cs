@@ -10,7 +10,7 @@ namespace ImageClassifier.ViewModel.ViewModels
     {
         private readonly IJsonStorageService<ImageItemModel> _storageService;
         private readonly IFileScanner _fileScanner;
-        private readonly IImageResizeService _imageResizeService;
+        private readonly IImageTransformationService _imageTransformationService;
         private readonly ITaskCommanderService _taskCommanderService;
 
         [ObservableProperty]
@@ -24,12 +24,12 @@ namespace ImageClassifier.ViewModel.ViewModels
         public FileCollectionViewModel(
             IJsonStorageService<ImageItemModel> storageService,
             IFileScanner fileScanner,
-            IImageResizeService imageResizeService,
+            IImageTransformationService imageTransformationService,
             ITaskCommanderService taskCommanderService)
         {
             _storageService = storageService;
             _fileScanner = fileScanner;
-            _imageResizeService = imageResizeService;
+            _imageTransformationService = imageTransformationService;
             _taskCommanderService = taskCommanderService;
 
             _taskCommanderService.AddTask(LoadSavedFilesAsync);
@@ -40,20 +40,20 @@ namespace ImageClassifier.ViewModel.ViewModels
             var models = await _storageService.LoadFilesAsync();
             Files.Clear();
             foreach (var model in models)
-                Files.Add(new ImageItemViewModel(model, _imageResizeService, _taskCommanderService));
+                Files.Add(new ImageItemViewModel(model, _imageTransformationService, _taskCommanderService));
         }
 
         public async Task AddFilesFromFolderAsync(string folderPath)
         {
             var models = await _fileScanner.ScanFolderAsync(folderPath);
             foreach (var model in models)
-                Files.Add(new ImageItemViewModel(model, _imageResizeService, _taskCommanderService));
+                Files.Add(new ImageItemViewModel(model, _imageTransformationService, _taskCommanderService));
             await SaveAsync();
         }
 
         public async Task AddFileAsync(ImageItemModel model)
         {
-            Files.Add(new ImageItemViewModel(model, _imageResizeService, _taskCommanderService));
+            Files.Add(new ImageItemViewModel(model, _imageTransformationService, _taskCommanderService));
             await SaveAsync();
         }
 
