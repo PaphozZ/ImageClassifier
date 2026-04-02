@@ -15,10 +15,10 @@
         </Grid.RowDefinitions>
 
         <CollectionView ItemsSource="{Binding FileCollection.Files}"
-                Margin="10"
-                VerticalScrollBarVisibility="Always"
-                Background="White">
-    <CollectionView.ItemsLayout>
+                        Margin="10"
+                        VerticalScrollBarVisibility="Always"
+                        Background="White">
+            <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical"
                                  x:Name="DynamicGridLayout" />
             </CollectionView.ItemsLayout>

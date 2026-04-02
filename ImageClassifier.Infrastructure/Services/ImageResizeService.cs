@@ -30,27 +30,4 @@ public class ImageResizeService : IImageResizeService
             }
         });
     }
-
-    public async Task<byte[]?> ResizeTo224(string imagePath)
-    {
-        return await Task.Run(() =>
-        {
-            try
-            {
-                using var original = SKBitmap.Decode(imagePath);
-                if (original == null) return null;
-
-                using var resized = new SKBitmap(224, 224);
-                original.ScalePixels(resized, new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear));
-
-                using var image = SKImage.FromBitmap(resized);
-                using var data = image.Encode(SKEncodedImageFormat.Png, 90);
-                return data.ToArray();
-            }
-            catch
-            {
-                return null;
-            }
-        });
-    }
 }

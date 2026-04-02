@@ -34,21 +34,19 @@ public class ModelTrainingService : IModelTrainingService
     {
         foreach (var item in positiveItems)
         {
-            _taskCommanderService.AddTask(async() =>
+            var fileInfo = new FileInfo(item.FullPath);
+            if (fileInfo.Exists && fileInfo.Length > 0)
             {
-                var bytes = await _imageResizeService.ResizeTo224(item.FullPath);
-                if (bytes != null)
-                    _imagesData.Add(new ImageData { ImageBytes = bytes, Label = label });
-            });
+                _imagesData.Add(new ImageData { ImagePath = item.FullPath, Label = label });
+            }
         }
         foreach (var item in negativeItems)
         {
-            _taskCommanderService.AddTask(async() =>
+            var fileInfo = new FileInfo(item.FullPath);
+            if (fileInfo.Exists && fileInfo.Length > 0)
             {
-                var bytes = await _imageResizeService.ResizeTo224(item.FullPath);
-                if (bytes != null)
-                    _imagesData.Add(new ImageData { ImageBytes = bytes, Label = "Negative" });
-            });
+                _imagesData.Add(new ImageData { ImagePath = item.FullPath, Label = "Negative" });
+            }
         }
 
         await _taskCommanderService.WaitForAllAsync();
@@ -89,6 +87,11 @@ public class ModelTrainingService : IModelTrainingService
         IDataView data = mlContext.Data.LoadFromEnumerable(_imagesData);
 
         var pipeline = mlContext.Transforms.Conversion.MapValueToKey("Label")
+            .Append(mlContext.Transforms.LoadRawImageBytes(
+                outputColumnName: "ImageBytes",
+                imageFolder: null,
+                inputColumnName: "ImagePath"
+                ))
             .Append(mlContext.MulticlassClassification.Trainers.ImageClassification(options))
             .Append(mlContext.Transforms.Conversion.MapKeyToValue("PredictedLabel"));
 

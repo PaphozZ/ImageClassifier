@@ -30,12 +30,11 @@ namespace ImageClassifier.Infrastructure.Services
         {
             foreach (var item in items)
             {
-                _taskCommanderService.AddTask(async () =>
+                var fileInfo = new FileInfo(item.FullPath);
+                if (fileInfo.Exists && fileInfo.Length > 0)
                 {
-                    var bytes = await _imageResizeService.ResizeTo224(item.FullPath);
-                    if (bytes != null)
-                        _imagesData.Add(new ImageData { ImageBytes = bytes, FullPath = item.FullPath });
-                });
+                    _imagesData.Add(new ImageData { ImagePath = item.FullPath });
+                }
             }
         }
 
@@ -96,14 +95,14 @@ namespace ImageClassifier.Infrastructure.Services
 
                     foreach (var data in _imagesData)
                     {
-                        var prediction = predictionEngine.Predict(new ImageData { ImageBytes = data.ImageBytes });
+                        var prediction = predictionEngine.Predict(new ImageData { ImagePath = data.ImagePath });
                         var predictedLabel = prediction.PredictedLabel;
                         var probability = prediction.Score?.Max() ?? 0;
                         var model = await _modelManager.GetModelByLabelAsync(label);
                         var modifiedDate = model?.LastModified;
 
-                        var item = items.FirstOrDefault(i => i.FullPath == data.FullPath);
-                        if (item != null && data.FullPath != null && predictedLabel != "Negative" && !string.IsNullOrEmpty(predictedLabel))
+                        var item = items.FirstOrDefault(i => i.FullPath == data.ImagePath);
+                        if (item != null && data.ImagePath != null && predictedLabel != "Negative" && !string.IsNullOrEmpty(predictedLabel))
                         {
                             item.Labels.Add(new LabelModel(
                                 name: predictedLabel!,
