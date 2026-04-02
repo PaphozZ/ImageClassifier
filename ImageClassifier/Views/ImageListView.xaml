@@ -6,7 +6,6 @@
              x:Class="ImageClassifier.Views.ImageListView"
              x:DataType="vm:PreviewViewModel">
     <ContentView.Resources>
-        <c:WidthToColumnCountConverter x:Key="WidthToColumnCountConverter" />
         <c:DatasetClassToIconConverter x:Key="DatasetClassToIconConverter" />
     </ContentView.Resources>
 
@@ -16,12 +15,12 @@
         </Grid.RowDefinitions>
 
         <CollectionView ItemsSource="{Binding FileCollection.Files}"
-                        Margin="10"
-                        VerticalScrollBarVisibility="Always"
-                        Background="White">
-            <CollectionView.ItemsLayout>
+                Margin="10"
+                VerticalScrollBarVisibility="Always"
+                Background="White">
+    <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical"
-                                 Span="{Binding Width, Source={x:Reference PreviewGrid}, Converter={StaticResource WidthToColumnCountConverter}, ConverterParameter=360, x:DataType=Grid}" />
+                                 x:Name="DynamicGridLayout" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:ImageItemViewModel">
