@@ -49,6 +49,7 @@ public class ImageTransformationService : IImageTransformationService
 
                 var augmentedImages = new List<string?>();
                 var random = new Random();
+                var isFirstLoop = true;
 
                 while (augmentedImages.Count < targetCount)
                 {
@@ -57,10 +58,11 @@ public class ImageTransformationService : IImageTransformationService
                         if (augmentedImages.Count >= targetCount) break;
                         if (string.IsNullOrEmpty(originalPath)) continue;
 
-                        var newPath = AugmentSingleImage(originalPath, random, tempDir);
+                        var newPath = AugmentSingleImage(originalPath, random, tempDir, isFirstLoop);
                         if (newPath != null)
                             augmentedImages.Add(newPath);
                     }
+                    isFirstLoop = false;
                 }
                 return augmentedImages;
             }
@@ -71,7 +73,7 @@ public class ImageTransformationService : IImageTransformationService
         });
     }
 
-    private string? AugmentSingleImage(string originalPath, Random random, string tempDir)
+    private string? AugmentSingleImage(string originalPath, Random random, string tempDir, bool isFirstLoop)
     {
         using var originalBitmap = SKBitmap.Decode(originalPath);
         if (originalBitmap == null) return null;
@@ -86,7 +88,10 @@ public class ImageTransformationService : IImageTransformationService
         float centerY = originalBitmap.Height / 2f;
         canvas.Translate(centerX, centerY);
         canvas.RotateDegrees(random.Next(-15, 16));
-        canvas.Scale(-1, 1);
+        if (isFirstLoop || random.NextDouble() > 0.5)
+        { 
+            canvas.Scale(-1, 1);
+        }
         canvas.Translate(-centerX, -centerY);
 
         canvas.DrawBitmap(originalBitmap, 0, 0);

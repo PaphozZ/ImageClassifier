@@ -23,7 +23,7 @@ namespace ImageClassifier.Infrastructure.Services
             _modelManager = modelManager;
         }
 
-        private void PrepareImagesDataAsync(IEnumerable<ImageItemModel> items)
+        private void PrepareImagesData(IEnumerable<ImageItemModel> items)
         {
             foreach (var item in items)
             {
@@ -44,7 +44,7 @@ namespace ImageClassifier.Infrastructure.Services
             {
                 await _dialogService.DisplayAlert("Сообщение", "Классификация начнется после завершения фоновых задач", "OK");
             }
-            PrepareImagesDataAsync(items);
+            PrepareImagesData(items);
 
             List<ImageItemModel> labeledItems = new();
             foreach (var label in labels)
@@ -65,14 +65,14 @@ namespace ImageClassifier.Infrastructure.Services
                 await _taskCommanderService.WaitForAllAsync();
 
                 var labeledBatch = await PredictBatchAsync(mlContext, trainedModel, items, label);
-                foreach (var batchItem in labeledBatch) 
+                foreach (var batchItem in labeledBatch)
                 {
                     var labeledItem = labeledItems.FirstOrDefault(i => i.FullPath == batchItem.FullPath);
                     if (labeledItem == null)
                     {
                         labeledItems.Add(batchItem);
                     }
-                    else 
+                    else
                     {
                         labeledItem.Labels.AddRange(batchItem.Labels);
                     }
@@ -92,19 +92,31 @@ namespace ImageClassifier.Infrastructure.Services
 
                     foreach (var data in _imagesData)
                     {
-                        var prediction = predictionEngine.Predict(new ImageData { ImagePath = data.ImagePath });
+                        var item = items.FirstOrDefault(i => i.FullPath == data.ImagePath);
+                        var model = await _modelManager.GetModelByLabelAsync(label);
+                        var existingLabel = item?.Labels.FirstOrDefault(l => l.Name == label);
+                        if (item != null
+                            && model != null 
+                            && existingLabel != null 
+                            && model.LastModified < existingLabel.LastModified)
+                        {
+                            results.Add(item);
+                            continue;
+                        }
+
+                        var prediction = predictionEngine.Predict(data);
                         var predictedLabel = prediction.PredictedLabel;
                         var probability = prediction.Score?.Max() ?? 0;
-                        var model = await _modelManager.GetModelByLabelAsync(label);
-                        var modifiedDate = model?.LastModified;
 
-                        var item = items.FirstOrDefault(i => i.FullPath == data.ImagePath);
-                        if (item != null && data.ImagePath != null && predictedLabel != "Negative" && !string.IsNullOrEmpty(predictedLabel))
+                        if (item != null 
+                            && data.ImagePath != null 
+                            && predictedLabel != "Negative" 
+                            && !string.IsNullOrEmpty(predictedLabel))
                         {
                             item.Labels.Add(new LabelModel(
                                 name: predictedLabel!,
                                 probability: probability,
-                                lastModified: modifiedDate ?? throw new InvalidOperationException()));
+                                lastModified: DateTime.Now));
                             results.Add(item);
                         }
                     }

@@ -54,34 +54,36 @@ public class ModelTrainingService : IModelTrainingService
         }
         if (positiveCount != negativeCount)
         {
-            _taskCommanderService.AddTask(async () =>
-            {
-                bool positiveLarger = positiveCount > negativeCount;
-                string minorityLabel = positiveLarger ? "Negative" : label;
-                int needed = Math.Abs(positiveCount - negativeCount);
-
-                var minorityPaths = _imagesData
-                    .Where(p => p.Label == minorityLabel)
-                    .Select(p => p.ImagePath)
-                    .ToList();
-
-                var newPaths = await _imageTransformationService.AugmentImages(minorityPaths, needed);
-                if (newPaths == null) return;
-
-                foreach (var path in newPaths)
-                {
-                    if (path != null)
-                    {
-                        _imagesData.Add(new ImageData
-                        {
-                            ImagePath = path,
-                            Label = minorityLabel
-                        });
-                    }
-                }
-            });
+            _taskCommanderService.AddTask(() => BalanceClasses(positiveCount, negativeCount, label));
         }
         await _taskCommanderService.WaitForAllAsync();
+    }
+
+    private async Task BalanceClasses(int positiveCount, int negativeCount, string label)
+    {
+        bool positiveLarger = positiveCount > negativeCount;
+        string minorityLabel = positiveLarger ? "Negative" : label;
+        int needed = Math.Abs(positiveCount - negativeCount);
+
+        var minorityPaths = _imagesData
+            .Where(p => p.Label == minorityLabel)
+            .Select(p => p.ImagePath)
+            .ToList();
+
+        var newPaths = await _imageTransformationService.AugmentImages(minorityPaths, needed);
+        if (newPaths == null) return;
+
+        foreach (var path in newPaths)
+        {
+            if (path != null)
+            {
+                _imagesData.Add(new ImageData
+                {
+                    ImagePath = path,
+                    Label = minorityLabel
+                });
+            }
+        }
     }
 
     public async Task TrainAsync(IEnumerable<ImageItemModel> positiveItems, IEnumerable<ImageItemModel> negativeItems, string label)
