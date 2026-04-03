@@ -97,8 +97,8 @@ namespace ImageClassifier.ViewModel.ViewModels
 
                     if (existing != null)
                     {
-                        foreach (var a in existing)
-                            vm.Labels.Remove(a);
+                        foreach (var item in existing)
+                            vm.Labels.Remove(item);
                     }
                     if (labelData != null)
                     {

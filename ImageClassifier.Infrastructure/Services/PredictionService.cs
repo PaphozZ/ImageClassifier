@@ -116,10 +116,14 @@ namespace ImageClassifier.Infrastructure.Services
                             && data.ImagePath != null
                             && !string.IsNullOrEmpty(predictedLabel))
                         {
-                            item.Labels.Add(new LabelModel(
+                            var newLabel = new LabelModel(
                                 name: predictedLabel!,
                                 probability: probability,
-                                lastModified: DateTime.Now));
+                                lastModified: DateTime.Now);
+                            var oldLabel = item.Labels.FirstOrDefault(l => l.Name == predictedLabel);
+                            if (oldLabel != null)
+                                item.Labels.Remove(oldLabel);
+                            item.Labels.Add(newLabel);
                             results.Add(item);
                         }
                     }
