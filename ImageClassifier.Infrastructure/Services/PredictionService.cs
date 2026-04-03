@@ -96,8 +96,8 @@ namespace ImageClassifier.Infrastructure.Services
                         var model = await _modelManager.GetModelByLabelAsync(label);
                         var existingLabel = item?.Labels.FirstOrDefault(l => l.Name == label);
                         if (item != null
-                            && model != null 
-                            && existingLabel != null 
+                            && model != null
+                            && existingLabel != null
                             && model.LastModified < existingLabel.LastModified)
                         {
                             results.Add(item);
@@ -107,10 +107,13 @@ namespace ImageClassifier.Infrastructure.Services
                         var prediction = predictionEngine.Predict(data);
                         var predictedLabel = prediction.PredictedLabel;
                         var probability = prediction.Score?.Max() ?? 0;
-
-                        if (item != null 
-                            && data.ImagePath != null 
-                            && predictedLabel != "Negative" 
+                        if (predictedLabel == "Negative")
+                        {
+                            predictedLabel = label;
+                            probability = prediction.Score?.Min() ?? 0;
+                        }
+                        if (item != null
+                            && data.ImagePath != null
                             && !string.IsNullOrEmpty(predictedLabel))
                         {
                             item.Labels.Add(new LabelModel(

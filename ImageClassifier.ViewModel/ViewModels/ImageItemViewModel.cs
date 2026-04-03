@@ -3,6 +3,7 @@ using ImageClassifier.Core.Enums;
 using ImageClassifier.Core.Interfaces;
 using ImageClassifier.Core.Models;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace ImageClassifier.ViewModel.ViewModels;
 
@@ -17,8 +18,8 @@ public partial class ImageItemViewModel : ObservableObject
     public long Size { get; }
     public DateTime LastModified { get; }
 
-    [ObservableProperty]
-    private ObservableCollection<LabelViewModel> _labels = new();
+    public ObservableCollection<LabelViewModel> Labels { get; } = new();
+    public IEnumerable<LabelViewModel> VisibleLabels => Labels.Where(l => l.Probability >= 0.5);
 
     [ObservableProperty]
     private bool _isDeleted;
@@ -47,6 +48,14 @@ public partial class ImageItemViewModel : ObservableObject
             Labels.Add(new(label.Name, label.Probability, label.LastModified));
 
         _taskCommanderService.AddTask(LoadThumbnailAsync);
+
+        Labels.CollectionChanged += (s, e) => OnPropertyChanged(nameof(VisibleLabels));
+    }
+
+    private void OnLabelPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(LabelViewModel.Probability))
+            OnPropertyChanged(nameof(VisibleLabels));
     }
 
     public async Task LoadThumbnailAsync()

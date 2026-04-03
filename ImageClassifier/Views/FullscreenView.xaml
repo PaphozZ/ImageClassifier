@@ -39,7 +39,7 @@
                         <Grid Grid.Row="0"
                               BackgroundColor="White" />
                         <CollectionView Grid.Row="1"
-                                        ItemsSource="{Binding Fullscreen.SelectedImageItem.Labels}"
+                                        ItemsSource="{Binding Fullscreen.SelectedImageItem.VisibleLabels}"
                                         HorizontalOptions="Center"
                                         VerticalOptions="Center"
                                         Margin="10">
