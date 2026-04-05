@@ -2,7 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using ImageClassifier.Core.Enums;
 using ImageClassifier.ViewModel.Enums;
-using ImageClassifier.ViewModel.ViewModels;
+
+namespace ImageClassifier.ViewModel.ViewModels;
 
 public partial class DragDropManagerViewModel : ObservableObject
 {
