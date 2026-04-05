@@ -9,7 +9,7 @@ public partial class DragDropManagerViewModel : ObservableObject
     private readonly FileCollectionViewModel _fileCollection;
     private readonly ModeManagerViewModel _modeManager;
 
-    private ImageItemViewModel? _draggedItem;
+    private object? _draggedItem;
 
     public DragDropManagerViewModel(
         FileCollectionViewModel fileCollection,
@@ -20,22 +20,28 @@ public partial class DragDropManagerViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void DragStarting(ImageItemViewModel item) => _draggedItem = item;
+    private void DragStarting(object item) => _draggedItem = item;
 
     [RelayCommand]
     private void DropToPositiveItems()
     {
-        if (_draggedItem != null && !_draggedItem.IsDeleted && !_fileCollection.PositiveItems.Contains(_draggedItem))
+        if (_draggedItem != null)
         {
-            _fileCollection.PositiveItems.Add(_draggedItem);
-            if (_fileCollection.NegativeItems.Contains(_draggedItem))
-                _fileCollection.NegativeItems.Remove(_draggedItem);
-            _draggedItem.DatasetClass = DatasetClass.Positive;
-            _draggedItem = null;
-
-            if (_modeManager.CurrentMode == AppMode.Predict)
+            if (_draggedItem is ImageItemViewModel draggedImageItem)
             {
-                _modeManager.IsNegativeVisible = false;
+                if (!draggedImageItem.IsDeleted && !_fileCollection.PositiveItems.Contains(draggedImageItem))
+                {
+                    _fileCollection.PositiveItems.Add(draggedImageItem);
+                    if (_fileCollection.NegativeItems.Contains(draggedImageItem))
+                        _fileCollection.NegativeItems.Remove(draggedImageItem);
+                    draggedImageItem.DatasetClass = DatasetClass.Positive;
+                    _draggedItem = null;
+
+                    if (_modeManager.CurrentMode == AppMode.Predict)
+                    {
+                        _modeManager.IsNegativeVisible = false;
+                    }
+                }
             }
         }
     }
@@ -43,56 +49,30 @@ public partial class DragDropManagerViewModel : ObservableObject
     [RelayCommand]
     private async Task DropToNegativeItems()
     {
-        if (_draggedItem != null && !_draggedItem.IsDeleted && !_fileCollection.NegativeItems.Contains(_draggedItem))
+        if (_draggedItem != null)
         {
-            if (_modeManager.CurrentMode == AppMode.Preview)
+            if (_draggedItem is ImageItemViewModel draggedImageItem)
             {
-                await _fileCollection.RemoveFileAsync(_draggedItem);
-            }
-            else
-            {
-                _fileCollection.NegativeItems.Add(_draggedItem);
-                if (_fileCollection.PositiveItems.Contains(_draggedItem))
-                    _fileCollection.PositiveItems.Remove(_draggedItem);
-                _draggedItem.DatasetClass = DatasetClass.Negative;
-
-                if (_modeManager.CurrentMode == AppMode.Predict)
+                if (!draggedImageItem.IsDeleted && !_fileCollection.NegativeItems.Contains(draggedImageItem))
                 {
-                    _modeManager.IsPositiveVisible = false;
+                    if (_modeManager.CurrentMode == AppMode.Preview)
+                    {
+                        await _fileCollection.RemoveFileAsync(draggedImageItem);
+                    }
+                    else
+                    {
+                        _fileCollection.NegativeItems.Add(draggedImageItem);
+                        if (_fileCollection.PositiveItems.Contains(draggedImageItem))
+                            _fileCollection.PositiveItems.Remove(draggedImageItem);
+                        draggedImageItem.DatasetClass = DatasetClass.Negative;
+
+                        if (_modeManager.CurrentMode == AppMode.Predict)
+                        {
+                            _modeManager.IsPositiveVisible = false;
+                        }
+                    }
+                    _draggedItem = null;
                 }
-            }
-            _draggedItem = null;
-        }
-    }
-
-    [RelayCommand]
-    private void RemoveLastPositiveItem()
-    {
-        var lastItem = _fileCollection.PositiveItems.LastOrDefault();
-        if (lastItem != null)
-        {
-            lastItem.DatasetClass = DatasetClass.None;
-            _fileCollection.PositiveItems.Remove(lastItem);
-
-            if (_modeManager.CurrentMode == AppMode.Predict && _fileCollection.PositiveItems.Count == 0)
-            {
-                _modeManager.IsNegativeVisible = true;
-            }
-        }
-    }
-
-    [RelayCommand]
-    private void RemoveLastNegativeItem()
-    {
-        var lastItem = _fileCollection.NegativeItems.LastOrDefault();
-        if (lastItem != null)
-        {
-            lastItem.DatasetClass = DatasetClass.None;
-            _fileCollection.NegativeItems.Remove(lastItem);
-
-            if (_modeManager.CurrentMode == AppMode.Predict && _fileCollection.NegativeItems.Count == 0)
-            {
-                _modeManager.IsPositiveVisible = true;
             }
         }
     }

@@ -17,12 +17,7 @@
             <Grid Grid.Row="0"
                   BackgroundColor="LightGray"
                   IsVisible="{Binding ModeManager.IsPositiveVisible}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Border Grid.Row="1"
-                        HeightRequest="160"
+                <Border HeightRequest="160"
                         StrokeShape="RoundRectangle 10"
                         BackgroundColor="LightGreen"
                         Margin="10"
@@ -31,12 +26,53 @@
                         Stroke="Black">
                     <Border.GestureRecognizers>
                         <DropGestureRecognizer DropCommand="{Binding DragDropManager.DropToPositiveItemsCommand}" />
-                        <TapGestureRecognizer Command="{Binding DragDropManager.RemoveLastPositiveItemCommand}" />
+                        <TapGestureRecognizer Command="{Binding SidePanel.RemoveLastPositiveItemCommand}" />
                     </Border.GestureRecognizers>
                     <Label HorizontalTextAlignment="Center"
                            VerticalTextAlignment="Center"
                            Text="{Binding FileCollection.PositiveItems.Count}"
                            FontSize="72" />
+                </Border>
+            </Grid>
+
+            <Grid Grid.Row="0"
+                  BackgroundColor="LightGray"
+                  IsVisible="{Binding ModeManager.IsLabelsVisible}">
+                <Border WidthRequest="160"
+                        HeightRequest="160"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="White"
+                        StrokeThickness="1"
+                        Stroke="Gray"
+                        Padding="2">
+                    <ScrollView VerticalScrollBarVisibility="Always">
+                        <FlexLayout Direction="Row"
+                                    Wrap="Wrap"
+                                    JustifyContent="Start"
+                                    AlignItems="Start"
+                                    BindableLayout.ItemsSource="{Binding SidePanel.LabelsCollection}"
+                                    AlignContent="Start">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:LabelViewModel">
+                                    <Border StrokeShape="RoundRectangle 5"
+                                            BackgroundColor="LightBlue"
+                                            Stroke="Transparent"
+                                            Margin="2">
+                                        <Label Text="{Binding Name}"
+                                               TextColor="Black"
+                                               BackgroundColor="Transparent"
+                                               VerticalOptions="Center"
+                                               HorizontalOptions="Center"
+                                               Padding="12,10" />
+                                        <Border.GestureRecognizers>
+                                            <DragGestureRecognizer DragStartingCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:PreviewViewModel}}, Path=DragDropManager.DragStartingCommand, x:DataType=vm:PreviewViewModel}"
+                                                                   DragStartingCommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                    </ScrollView>
                 </Border>
             </Grid>
 
@@ -51,10 +87,10 @@
                 </Grid.RowDefinitions>
                 <Button Grid.Row="0"
                         Text="Загрузить файл"
-                        Command="{Binding PickImageCommand}" />
+                        Command="{Binding SidePanel.PickImageCommand}" />
                 <Button Grid.Row="1"
                         Text="Загрузить папку"
-                        Command="{Binding PickFolderCommand}" />
+                        Command="{Binding SidePanel.PickFolderCommand}" />
                 <Border Grid.Row="2"
                         HeightRequest="1"
                         BackgroundColor="Transparent"
@@ -62,23 +98,18 @@
                         Stroke="Gray" />
                 <Button Grid.Row="3"
                         Text="{Binding ModeManager.TrainButtonText}"
-                        Command="{Binding TrainTappedCommand}"
-                        IsEnabled="{Binding ModeManager.TrainButtonIsEnabled}"/>
+                        Command="{Binding SidePanel.TrainTappedCommand}"
+                        IsEnabled="{Binding ModeManager.TrainButtonIsEnabled}" />
                 <Button Grid.Row="4"
                         Text="{Binding ModeManager.PredictButtonText}"
-                        Command="{Binding PredictTappedCommand}"
+                        Command="{Binding SidePanel.PredictTappedCommand}"
                         IsEnabled="{Binding ModeManager.PredictButtonIsEnabled}" />
             </Grid>
 
             <Grid Grid.Row="4"
                   BackgroundColor="LightGray"
                   IsVisible="{Binding ModeManager.IsNegativeVisible}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Border Grid.Row="1"
-                        HeightRequest="160"
+                <Border HeightRequest="160"
                         StrokeShape="RoundRectangle 10"
                         BackgroundColor="IndianRed"
                         Margin="10"
@@ -88,7 +119,7 @@
                         Stroke="Black">
                     <Border.GestureRecognizers>
                         <DropGestureRecognizer DropCommand="{Binding DragDropManager.DropToNegativeItemsCommand}" />
-                        <TapGestureRecognizer Command="{Binding DragDropManager.RemoveLastNegativeItemCommand}" />
+                        <TapGestureRecognizer Command="{Binding SidePanel.RemoveLastNegativeItemCommand}" />
                     </Border.GestureRecognizers>
                     <Grid>
                         <Label HorizontalTextAlignment="Center"

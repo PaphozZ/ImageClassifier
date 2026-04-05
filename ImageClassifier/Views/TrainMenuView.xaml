@@ -32,7 +32,8 @@
                                    HorizontalTextAlignment="Center"
                                    VerticalTextAlignment="Center"
                                    Text="{Binding TrainMenu.NewLabel}"
-                                   IsEnabled="{Binding TrainMenu.EntryIsEnabled}"/>
+                                   IsEnabled="{Binding TrainMenu.EntryIsEnabled}"
+                                   IsSpellCheckEnabled ="False" />
                             </VerticalStackLayout>
                     </Border>
                 </StackLayout>

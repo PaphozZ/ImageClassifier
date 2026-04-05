@@ -28,6 +28,9 @@ namespace ImageClassifier.ViewModel.ViewModels
         [ObservableProperty]
         private bool _isNegativeVisible = true;
 
+        [ObservableProperty]
+        private bool _isLabelsVisible = true;
+
         public ModeManagerViewModel(
             FileCollectionViewModel fileCollection)
         {
@@ -39,10 +42,10 @@ namespace ImageClassifier.ViewModel.ViewModels
             if (CurrentMode == mode) return;
 
             (CurrentMode, IsPreviewMode, IsPositiveVisible, IsNegativeVisible,
-             TrainButtonText, PredictButtonText, TrainButtonIsEnabled, PredictButtonIsEnabled) = mode switch
+             TrainButtonText, PredictButtonText, TrainButtonIsEnabled, PredictButtonIsEnabled, IsLabelsVisible) = mode switch
              {
-                 AppMode.Preview =>     (AppMode.Preview, true, false, true, "Обучение", "Классификация", true, true),
-                 AppMode.Train =>       (AppMode.Train, false, true, true, "Назад", "Обучить!", true, true),
+                 AppMode.Preview =>     (AppMode.Preview, true, false, true, "Обучение", "Классификация", true, true, true),
+                 AppMode.Train =>       (AppMode.Train, false, true, true, "Назад", "Обучить!", true, true, false),
                  AppMode.Predict =>     (AppMode.Predict, 
                                             false,
                                             !_fileCollection.NegativeItems.Any(),
@@ -50,13 +53,15 @@ namespace ImageClassifier.ViewModel.ViewModels
                                             "Классифицировать!", 
                                             "Назад", 
                                             true, 
-                                            true),
+                                            true,
+                                            false),
                  AppMode.Processing =>  (AppMode.Processing,
                                             false,
                                             IsPositiveVisible,
                                             IsNegativeVisible,
                                             TrainButtonText,
                                             PredictButtonText,
+                                            false,
                                             false,
                                             false),
                  _ => default
